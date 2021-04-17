@@ -4,32 +4,53 @@ import java.io.{File, FileInputStream, FileReader}
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import io.github.jsarni.PipelineParser.DatasetStage.DatasetStage
+import io.github.jsarni.CaraStage.CaraStage
+import io.github.jsarni.CaraYaml.CaraYaml
 import org.yaml.snakeyaml.Yaml
 
+import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe._
+import scala.util.Try
 
-final class CaraParser[T <: CaraStage](path: String) {
+final class CaraParser(caraYaml: CaraYaml) {
 
-//  Try[List[CaraStage]]
-  final def loadFile: JsonNode = {
+  private[PipelineParser] def loadFile(): Try[JsonNode] =
+  for {
+    ios <- Try(new FileInputStream(new File(caraYaml.path)))
+    yaml = new Yaml()
+    mapper = new ObjectMapper().registerModules(DefaultScalaModule)
+    yamlObj = yaml.loadAs(ios, classOf[Any])
+    jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(yamlObj) // Formats YAML to a pretty printed JSON string - easy to read
+    jsonObj = mapper.readTree(jsonString)
+  } yield jsonObj
 
-    // Parsing the YAML file with SnakeYAML - since Jackson Parser does not have Anchors and reference support
-    val ios = new FileInputStream(new File(path))
-    val yaml = new Yaml()
-    val mapper = new ObjectMapper().registerModules(DefaultScalaModule)
-    val yamlObj = yaml.loadAs(ios, classOf[Any])
+  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStage]  = {
+    val stagesList = fileContent.at(caraYaml.header).iterator().asScala.toList
+    val stages = stagesList.map{
+      stageDesc =>
+        val name = stageDesc.at("/stage").asText()
 
-    // Converting the YAML to Jackson YAML - since it has more flexibility
-    val jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(yamlObj) // Formats YAML to a pretty printed JSON string - easy to read
-    val jsonObj = mapper.readTree(jsonString)
-    jsonObj
-  }
+        val paramsMap =
+          if (stageDesc.has("params")) {
+            val paramsJson = stageDesc.at("/params")
+            val paramList = paramsJson.iterator().asScala.toList
+            val paramNames = paramList.flatMap{ r =>r.fieldNames().asScala.toList}
 
-  def getFileType[T <: CaraStage]()(implicit tt: TypeTag[T]): String = {
-    if (typeOf[T] <:< typeOf[DatasetStage]) "/dataset" else "/model"
-  }
-  def parseStage[T <: CaraStage](): Unit = {
-    val fileHeader = getFileType()
+            val paramsZip = paramNames zip paramList
+            Some(
+              paramsZip.map{
+                (paramTuple) =>
+                  val name = paramTuple._1
+                  val value = paramTuple._2.at(s"/$name").asText()
+                  (name, value)
+              }.toMap
+            )
+          } else {
+            None
+          }
+
+        CaraStage(name, paramsMap)
+    }
+    stages
   }
 }

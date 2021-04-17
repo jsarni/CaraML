@@ -2,5 +2,7 @@ model:
 - stage: LogisticRegression
   params:
     - MaxIter: 10
-    - RegParam: 0.3
-    - ElasticNetParam: 0.1
+RegParam: 0.3
+    - ElasticNetParam:
+      - _1: 0.8
+- _2: 0.0
