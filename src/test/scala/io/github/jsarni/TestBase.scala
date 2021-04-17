@@ -5,7 +5,7 @@ import org.scalatest.{GivenWhenThen, OptionValues, PrivateMethodTester, TryValue
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-trait TestBase
+abstract class TestBase
   extends AnyFlatSpec
     with MockitoSugar
     with GivenWhenThen
