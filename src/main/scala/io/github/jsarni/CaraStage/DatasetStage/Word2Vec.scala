@@ -1,3 +1,3 @@
 package io.github.jsarni.CaraStage.DatasetStage
 
-case class Word2Vec()
+case class Word2Vec() extends CaraDataset
