@@ -7,12 +7,13 @@ case class TestStage(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetP
   extends CaraModel {
 
   @MapperConstructor
-  def this(params: Map[String, String]) =
+  def this(params: Map[String, String]) = {
     this(
       params.get("MaxIter").map(_.toInt),
       params.get("RegParam").map(_.toDouble),
       params.get("ElasticNetParam").map(_.toDouble)
     )
+  }
 }
 
 object TestStage {
