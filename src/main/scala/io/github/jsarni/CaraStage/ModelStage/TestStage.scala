@@ -3,22 +3,16 @@ package io.github.jsarni.CaraStage.ModelStage
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 
 
-class TestStage(MaxIter: Option[Int], RegParam: Option[Float], ElasticNetParam: Option[Float])
+case class TestStage(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetParam: Option[Double])
   extends CaraModel {
 
   @MapperConstructor
   def this(params: Map[String, String]) =
     this(
       params.get("MaxIter").map(_.toInt),
-      params.get("RegParam").map(_.toFloat),
-      params.get("ElasticNetParam").map(_.toFloat)
+      params.get("RegParam").map(_.toDouble),
+      params.get("ElasticNetParam").map(_.toDouble)
     )
-
-  def print() = {
-    println(MaxIter)
-    println(RegParam)
-    println(ElasticNetParam)
-  }
 }
 
 object TestStage {

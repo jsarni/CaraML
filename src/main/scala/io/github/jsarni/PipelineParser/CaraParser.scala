@@ -70,5 +70,4 @@ class CaraParser[T <: CaraStage](caraYaml: CaraYaml) extends ParserUtils with Ca
     stagesDescriptionsList.map(parseStageMap(_))
   }
 
-
 }

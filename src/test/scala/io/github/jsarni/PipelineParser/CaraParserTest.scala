@@ -2,9 +2,9 @@ package io.github.jsarni.PipelineParser
 
 import io.github.jsarni.TestBase
 import io.github.jsarni.CaraStage.CaraStageDescription
+import io.github.jsarni.CaraStage.ModelStage.TestStage
 import io.github.jsarni.CaraYaml.{DatasetYaml, ModelYaml}
 import org.codehaus.jackson.JsonNode
-
 import io.github.jsarni.PipelineParser.CaraParser
 
 import java.io.FileNotFoundException
@@ -87,6 +87,25 @@ class CaraParserTest extends TestBase {
 
     val res = modelParser.parseStage(stageDesc)
     print(res.get)
+
+  }
+
+  "parseStageMap" should "return parse the yaml description file to a json object" in {
+    val modelPath = getClass.getResource("/model.yaml").getPath
+    val modelYaml = new ModelYaml(modelPath)
+    val modelParser = new CaraParser(modelYaml)
+
+    val params = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
+    val stageDesc =
+      CaraStageDescription("TestStage", params)
+
+    val res = modelParser.parseStageMap(stageDesc)
+
+
+    res.isInstanceOf[TestStage] shouldBe true
+    res.asInstanceOf[TestStage].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
+    res.asInstanceOf[TestStage].RegParam shouldBe params.get("RegParam").map(_.toDouble)
+    res.asInstanceOf[TestStage].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
 
   }
 }
