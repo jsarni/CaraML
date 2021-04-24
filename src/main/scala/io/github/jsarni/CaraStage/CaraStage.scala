@@ -5,5 +5,7 @@ import org.apache.spark.ml.PipelineStage
 trait CaraStage {
 
   //TODO: Add builder function
-  def build(): PipelineStage
+  def build()= {
+    print("a")
+  }
 }

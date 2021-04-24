@@ -1,29 +1,18 @@
 package io.github.jsarni.PipelineParser
 
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription, CaraStageMapper}
-import io.github.jsarni.CaraYaml.{CaraYaml, FileTypes}
-import org.yaml.snakeyaml.Yaml
+import io.github.jsarni.CaraYaml.CaraYaml
 
-import java.io.{File, FileInputStream}
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-class CaraParser[T <: CaraStage](caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
+class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
 
-  private[PipelineParser] def loadFile(): Try[JsonNode] =
-  for {
-    ios <- Try(new FileInputStream(new File(caraYaml.filePath)))
-    yaml = new Yaml()
-    mapper = new ObjectMapper().registerModules(DefaultScalaModule)
-    yamlObj = yaml.loadAs(ios, classOf[Any])
-    jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(yamlObj) // Formats YAML to a pretty printed JSON string - easy to read
-    jsonObj = mapper.readTree(jsonString)
-  } yield jsonObj
+  val content = caraYaml.loadFile()
 
   private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStageDescription]  = {
-    val stagesList = fileContent.at(s"/${caraYaml.fileType}").iterator().asScala.toList
+    val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList
     val stages = stagesList.map{
       stageDesc =>
         val name = stageDesc.at("/stage").asText()
@@ -58,12 +47,7 @@ class CaraParser[T <: CaraStage](caraYaml: CaraYaml) extends ParserUtils with Ca
     } yield caraStage
 
   def parseStageMap(stageDescription: CaraStageDescription): CaraStage = {
-    caraYaml.fileType match {
-      case FileTypes.MODEL_FILE =>
-        mapModelStage(stageDescription)
-      case FileTypes.DATASET_FILE =>
-        mapDatasetStage(stageDescription)
-    }
+    mapStage(stageDescription)
   }
 
   def parseAllStages(stagesDescriptionsList: List[CaraStageDescription]): List[CaraStage] = {
