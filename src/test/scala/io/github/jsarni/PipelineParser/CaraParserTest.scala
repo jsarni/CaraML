@@ -83,9 +83,10 @@ class CaraParserTest extends TestBase {
     val modelParser = new CaraParser(modelYaml)
 
     val stageDesc =
-      CaraStageDescription("ExampleStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
+      CaraStageDescription("TestStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
 
     val res = modelParser.parseStage(stageDesc)
+    print(res.get)
 
   }
 }

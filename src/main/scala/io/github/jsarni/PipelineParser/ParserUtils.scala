@@ -12,7 +12,7 @@ trait ParserUtils {
         .toList
         .filter(_
           .getDeclaredAnnotations
-          .filter(_.toString.startsWith(s"@${classOf[MapperConstructor]}")).nonEmpty
+          .filter(_.toString.startsWith(s"@${classOf[MapperConstructor].getName}")).nonEmpty
         )
     mapperConstructoresList.length match {
       case 1 => Success(mapperConstructoresList.head)

@@ -53,10 +53,8 @@ class CaraParser[T <: CaraStage](caraYaml: CaraYaml) extends ParserUtils with Ca
   def parseStage(stageDescription: CaraStageDescription): Try[Any] =
     for {
       stageClass <- Try(Class.forName(s"io.github.jsarni.CaraStage.ModelStage.${stageDescription.stageName}"))
-      _ = println(stageClass)
       constructor <- getMapperConstructor(stageClass)
-      caraStage = constructor.newInstance(stageDescription.params).asInstanceOf
-      _ = println(caraStage)
+      caraStage = constructor.newInstance(stageDescription.params)
     } yield caraStage
 
   def parseStageMap(stageDescription: CaraStageDescription): CaraStage = {
