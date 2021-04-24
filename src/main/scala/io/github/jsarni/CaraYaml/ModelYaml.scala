@@ -1,6 +1,6 @@
 package io.github.jsarni.CaraYaml
 
 final class ModelYaml(yamlPath: String) extends CaraYaml {
-  override val header: String = "/model"
-  override val path: String = yamlPath
+  override val fileType: String = FileTypes.MODEL_FILE
+  override val filePath: String = yamlPath
 }

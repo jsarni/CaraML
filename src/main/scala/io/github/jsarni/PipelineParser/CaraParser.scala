@@ -1,22 +1,20 @@
 package io.github.jsarni.PipelineParser
 
-import java.io.{File, FileInputStream, FileReader}
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import io.github.jsarni.CaraStage.CaraStage
-import io.github.jsarni.CaraYaml.CaraYaml
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription, CaraStageMapper}
+import io.github.jsarni.CaraYaml.{CaraYaml, FileTypes}
 import org.yaml.snakeyaml.Yaml
 
+import java.io.{File, FileInputStream}
 import scala.collection.JavaConverters._
-import scala.reflect.runtime.universe._
 import scala.util.Try
 
-final class CaraParser(caraYaml: CaraYaml) {
+class CaraParser[T <: CaraStage](caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
 
   private[PipelineParser] def loadFile(): Try[JsonNode] =
   for {
-    ios <- Try(new FileInputStream(new File(caraYaml.path)))
+    ios <- Try(new FileInputStream(new File(caraYaml.filePath)))
     yaml = new Yaml()
     mapper = new ObjectMapper().registerModules(DefaultScalaModule)
     yamlObj = yaml.loadAs(ios, classOf[Any])
@@ -24,8 +22,8 @@ final class CaraParser(caraYaml: CaraYaml) {
     jsonObj = mapper.readTree(jsonString)
   } yield jsonObj
 
-  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStage]  = {
-    val stagesList = fileContent.at(caraYaml.header).iterator().asScala.toList
+  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStageDescription]  = {
+    val stagesList = fileContent.at(s"/${caraYaml.fileType}").iterator().asScala.toList
     val stages = stagesList.map{
       stageDesc =>
         val name = stageDesc.at("/stage").asText()
@@ -37,20 +35,39 @@ final class CaraParser(caraYaml: CaraYaml) {
             val paramNames = paramList.flatMap{ r =>r.fieldNames().asScala.toList}
 
             val paramsZip = paramNames zip paramList
-            Some(
               paramsZip.map{
-                (paramTuple) =>
+                paramTuple =>
                   val name = paramTuple._1
                   val value = paramTuple._2.at(s"/$name").asText()
                   (name, value)
               }.toMap
-            )
           } else {
-            None
+            Map.empty[String, String]
           }
 
-        CaraStage(name, paramsMap)
+        CaraStageDescription(name, paramsMap)
     }
     stages
   }
+
+  def parseStage(stageDescription: CaraStageDescription): Try[Any] =
+    for {
+      stageClass <- Try(Class.forName(s"io.github.jsarni.CaraStage.ModelStage.${stageDescription.stageName}"))
+      constructor <- getMapperConstructor(stageClass)
+      caraStage = constructor.newInstance(stageDescription.params)
+    } yield caraStage
+
+  def parseStageMap(stageDescription: CaraStageDescription): CaraStage = {
+    caraYaml.fileType match {
+      case FileTypes.MODEL_FILE =>
+        mapModelStage(stageDescription)
+      case FileTypes.DATASET_FILE =>
+        mapDatasetStage(stageDescription)
+    }
+  }
+
+  def parseAllStages(stagesDescriptionsList: List[CaraStageDescription]): List[CaraStage] = {
+    stagesDescriptionsList.map(parseStageMap(_))
+  }
+
 }

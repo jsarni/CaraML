@@ -1,3 +1,9 @@
 package io.github.jsarni.CaraStage
 
-case class CaraStage (stageName: String, args: Option[Map[String, String]]) {}
+import org.apache.spark.ml.PipelineStage
+
+trait CaraStage {
+
+  //TODO: Add builder function
+  def build(): PipelineStage
+}
