@@ -1,6 +1,7 @@
 package io.github.jsarni.CaraStage.ModelStage
 
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
+import org.apache.spark.ml.PipelineStage
 
 
 case class TestStage(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetParam: Option[Double])
@@ -14,6 +15,8 @@ case class TestStage(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetP
       params.get("ElasticNetParam").map(_.toDouble)
     )
   }
+
+  override def build(): PipelineStage = ???
 }
 
 object TestStage {

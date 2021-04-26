@@ -1,13 +1,14 @@
 package io.github.jsarni.CaraStage
 
 import io.github.jsarni.CaraStage.DatasetStage.CaraDataset
-import io.github.jsarni.CaraStage.ModelStage.{CaraModel, TestStage}
+import io.github.jsarni.CaraStage.ModelStage.{CaraModel, LogisticRegression, TestStage}
 
 trait CaraStageMapper {
 
   def mapModelStage(stageDescription: CaraStageDescription): CaraModel = {
     stageDescription.stageName match {
       case "TestStage" => TestStage(stageDescription.params)
+      case "LogisticRegression" => LogisticRegression(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Model stage name. Please verify the corresponding Yaml File")
 
