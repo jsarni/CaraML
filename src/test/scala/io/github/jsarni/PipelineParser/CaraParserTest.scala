@@ -109,7 +109,15 @@ class CaraParserTest extends TestBase {
 
   }
   "LogisticRegression" should("Create an lr model and set all parameters with there args values") in {
-    val lr = LogisticRegression( Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1", "Family" -> "multinomial"))
+    val basicParams = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1", "Family" -> "multinomial")
+    val allParams = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1", "Family" -> "multinomial" ,"FeaturesCol" -> "FeatureColname"
+      , "FitIntercept" -> "True", "PredictionCol" -> "Age", "ProbabilityCol" -> "ProbaColname", "RawPredictionCol"-> "RawPredictColname"
+      , "Standardization" -> "True" , "Tol" -> "0.13", "WeightCol" -> "WeightColname")
+
+    val lr = LogisticRegression( basicParams)
+    val lr1 = LogisticRegression( allParams)
     lr.build()
+    lr1.build()
+
   }
 }

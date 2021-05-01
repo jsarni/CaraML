@@ -1,12 +1,14 @@
 package io.github.jsarni.CaraStage.ModelStage
-
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.classification.{LogisticRegression => log}
 
 
 
-case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetParam: Option[Double], Family:Option[String])
+case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetParam: Option[Double], Family:Option[String],FeaturesCol: Option[String]
+                              , FitIntercept: Option[Boolean], PredictionCol: Option[String], ProbabilityCol: Option[String], RawPredictionCol: Option[String]
+                              , Standardization: Option[Boolean], Thresholds: Option[Array[Double]] , Tol : Option[Double], WeightCol: Option[String])
+
   extends CaraModel {
 
   @MapperConstructor
@@ -15,25 +17,20 @@ case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], El
       params.get("MaxIter").map(_.toInt),
       params.get("RegParam").map(_.toDouble),
       params.get("ElasticNetParam").map(_.toDouble),
-      params.get("Family").map(_.toString)
+      params.get("Family").map(_.toString),
+      params.get("FeaturesCol").map(_.toString),
+      params.get("FitIntercept").map(_.toBoolean),
+      params.get("PredictionCol").map(_.toString),
+      params.get("ProbabilityCol").map(_.toString),
+      params.get("RawPredictionCol").map(_.toString),
+      params.get("Standardization").map(_.toBoolean),
+      params.get("Thresholds").map(_.split(",").map(_.toDouble)),
+      params.get("Tol").map(_.toDouble),
+      params.get("WeightCol").map(_.toString)
+
     )
   }
-  def GetMethode(lr : PipelineStage, field : Any, field_name : String)  = {
-    val MethodeName = "set"+field_name
-    field match {
-      case _ :java.lang.Long => lr.getClass.getMethod(MethodeName, field.asInstanceOf[Long].getClass)
-      case _: java.lang.Integer =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Int].getClass)
-      case _ : java.lang.Double =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Double].getClass )
-      case _ : java.lang.Float  =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Float].getClass )
-      case _ : java.lang.Character =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Char].getClass )
-      case _ : java.lang.Byte =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Byte].getClass )
-      case _ : java.lang.Boolean =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Boolean].getClass )
-      case _ : java.lang.Short =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Short].getClass )
-      case _ : java.lang.String =>   lr.getClass.getMethod(MethodeName, field.getClass )
 
-
-    }
-  }
   override def build(): PipelineStage = {
     val lr = new log()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
