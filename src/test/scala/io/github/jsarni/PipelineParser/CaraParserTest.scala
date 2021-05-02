@@ -1,15 +1,9 @@
 package io.github.jsarni.PipelineParser
 
-import io.github.jsarni.TestBase
 import io.github.jsarni.CaraStage.CaraStageDescription
-import io.github.jsarni.CaraStage.ModelStage.TestStage
+import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
 import io.github.jsarni.CaraYaml.CaraYaml
-import org.codehaus.jackson.JsonNode
-import io.github.jsarni.PipelineParser.CaraParser
-
-import java.io.FileNotFoundException
-import scala.io.Source
-import scala.util.Try
+import io.github.jsarni.TestBase
 
 class CaraParserTest extends TestBase {
 
@@ -33,19 +27,19 @@ class CaraParserTest extends TestBase {
   }
 
 
-  "parseStage" should "return parse the yaml description file to a json object" in {
-    val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
-    val caraParser = new CaraParser(caraYaml)
-
-
-    val stageDesc =
-      CaraStageDescription("TestStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
-
-    val res = caraParser.parseStage(stageDesc)
-    print(res.get)
-
-  }
+//  "parseStage" should "return parse the yaml description file to a json object" in {
+//    val caraPath = getClass.getResource("/cara.yaml").getPath
+//    val caraYaml = CaraYaml(caraPath)
+//    val caraParser = new CaraParser(caraYaml)
+//
+//
+//    val stageDesc =
+//      CaraStageDescription("TestStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
+//
+//    val res = caraParser.parseStage(stageDesc)
+//    print(res.get)
+//
+//  }
 
   "parseStageMap" should "return parse the yaml description file to a json object" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
@@ -53,15 +47,15 @@ class CaraParserTest extends TestBase {
 
     val params = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
     val stageDesc =
-      CaraStageDescription("TestStage", params)
+      CaraStageDescription("LogisticRegression", params)
 
     val res = caraParser.parseStageMap(stageDesc)
 
 
-    res.isInstanceOf[TestStage] shouldBe true
-    res.asInstanceOf[TestStage].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
-    res.asInstanceOf[TestStage].RegParam shouldBe params.get("RegParam").map(_.toDouble)
-    res.asInstanceOf[TestStage].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
+    res.isInstanceOf[LogisticRegression] shouldBe true
+    res.asInstanceOf[LogisticRegression].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
+    res.asInstanceOf[LogisticRegression].RegParam shouldBe params.get("RegParam").map(_.toDouble)
+    res.asInstanceOf[LogisticRegression].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
 
   }
 }
