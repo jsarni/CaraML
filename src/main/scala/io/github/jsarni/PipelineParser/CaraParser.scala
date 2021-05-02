@@ -10,11 +10,19 @@ import scala.util.Try
 
 class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
 
-  val content = caraYaml.loadFile()
+  val contentTry = caraYaml.loadFile()
 
+  def parse(): Try[Pipeline] = {
+    for {
+      content <- contentTry
+      stagesDescriptions = extractStages(content)
+      caraStages = parseStages(stagesDescriptions)
+      sparkStages = buildStages(caraStages)
+      pipeline = buildPipeline(sparkStages)
+    } yield pipeline
+  }
 
-
-  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStageDescription]  = {
+  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStageDescription] = {
     val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList
     val stages = stagesList.map{
       stageDesc =>
@@ -49,15 +57,15 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
       caraStage = constructor.newInstance(stageDescription.params)
     } yield caraStage
 
-  private[PipelineParser] def parseStageMap(stageDescription: CaraStageDescription): CaraStage = {
+  private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): CaraStage = {
     mapStage(stageDescription)
   }
 
-  private[PipelineParser] def parseAllStages(stagesDescriptionsList: List[CaraStageDescription]): List[CaraStage] = {
-    stagesDescriptionsList.map(parseStageMap(_))
+  private[PipelineParser] def parseStages(stagesDescriptionsList: List[CaraStageDescription]): List[CaraStage] = {
+    stagesDescriptionsList.map(parseSingleStageMap(_))
   }
 
-  private[PipelineParser] def buildAllStages(stagesList: List[CaraStage]): List[PipelineStage] = {
+  private[PipelineParser] def buildStages(stagesList: List[CaraStage]): List[PipelineStage] = {
     stagesList.map(_.build())
   }
 

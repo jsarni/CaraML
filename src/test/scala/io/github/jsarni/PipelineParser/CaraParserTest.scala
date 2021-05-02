@@ -43,7 +43,7 @@ class CaraParserTest extends TestBase {
 //
 //  }
 
-  "parseStageMap" should "parse a CaraStageDescription to a CaraStage " in {
+  "parseSingleStageMap" should "parse a CaraStageDescription to a CaraStage " in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
     val caraParser = new CaraParser(CaraYaml(caraPath))
 
@@ -51,9 +51,9 @@ class CaraParserTest extends TestBase {
     val stageDesc =
       CaraStageDescription("LogisticRegression", params)
 
-    val parseStageMap = PrivateMethod[CaraStage]('parseStageMap)
+    val parseSingleStageMap = PrivateMethod[CaraStage]('parseSingleStageMap)
 
-    val res = caraParser.invokePrivate(parseStageMap(stageDesc))
+    val res = caraParser.invokePrivate(parseSingleStageMap(stageDesc))
 
     res.isInstanceOf[LogisticRegression] shouldBe true
     res.asInstanceOf[LogisticRegression].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
@@ -61,7 +61,7 @@ class CaraParserTest extends TestBase {
     res.asInstanceOf[LogisticRegression].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
   }
 
-  "parseAllStages" should "parse a list of CaraStageDescription to the corresponding list of CaraStage" in {
+  "parseStages" should "parse a list of CaraStageDescription to the corresponding list of CaraStage" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
     val caraParser = new CaraParser(CaraYaml(caraPath))
 
@@ -74,13 +74,13 @@ class CaraParserTest extends TestBase {
 
     val expectedResult = List(LogisticRegression(params1), LogisticRegression(params2))
 
-    val parseAllStages = PrivateMethod[List[CaraStage]]('parseAllStages)
-    val res = caraParser.invokePrivate(parseAllStages(stagesDesc))
+    val parseStages = PrivateMethod[List[CaraStage]]('parseStages)
+    val res = caraParser.invokePrivate(parseStages(stagesDesc))
 
     res should contain theSameElementsAs expectedResult
   }
 
-  "buildAllStages" should "build a list PipelineStages out of a list of CaraStages" in {
+  "buildStages" should "build a list PipelineStages out of a list of CaraStages" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
     val caraParser = new CaraParser(CaraYaml(caraPath))
 
@@ -95,8 +95,8 @@ class CaraParserTest extends TestBase {
       new SparkLR().setMaxIter(20).setFitIntercept(false).setProbabilityCol("col1")
     )
 
-    val buildAllStages = PrivateMethod[List[PipelineStage]]('buildAllStages)
-    val res = caraParser.invokePrivate(buildAllStages(stagesList))
+    val buildStages = PrivateMethod[List[PipelineStage]]('buildStages)
+    val res = caraParser.invokePrivate(buildStages(stagesList))
 
     val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
     val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
@@ -117,5 +117,9 @@ class CaraParserTest extends TestBase {
     val res = caraParser.invokePrivate(buildPipeline(stagesList))
 
     res.getStages shouldBe new Pipeline().setStages(stagesList.toArray).getStages
+  }
+
+  "parse" should "build the described Pipeline of the Yaml File" in {
+    // TODO - Write test
   }
 }
