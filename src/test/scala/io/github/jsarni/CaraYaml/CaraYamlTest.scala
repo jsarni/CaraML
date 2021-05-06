@@ -1,6 +1,9 @@
 package io.github.jsarni.CaraYaml
 
+import java.io.FileNotFoundException
+
 import io.github.jsarni.TestBase
+import org.yaml.snakeyaml.scanner.ScannerException
 
 class CaraYamlTest extends TestBase {
 
@@ -19,9 +22,7 @@ class CaraYamlTest extends TestBase {
 
       val result = caraYaml.loadFile()
 
-      // TODO: Test on exception type
-      //    modelResult.get shouldBe isInstanceOf[FileNotFoundException]
-      result.isFailure shouldBe true
+      an [FileNotFoundException] should be thrownBy result.get
     }
 
     it should "Return an exception if the file format is not correct" in {
@@ -30,9 +31,7 @@ class CaraYamlTest extends TestBase {
 
       val result = caraYaml.loadFile()
 
-      // TODO: Test on exception type
-      //    modelResult.get shouldBe isInstanceOf[FileNotFoundException]
-      result.isFailure shouldBe true
+      an [ScannerException] should be thrownBy result.get
     }
 
 
