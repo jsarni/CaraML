@@ -5,18 +5,50 @@ import io.github.jsarni.CaraStage.DatasetStage._
 
 class CaraDatasetTest extends TestBase {
   "Word2Vec" should("build new Word2Vec") in {
-    val word_to_vec = Word2Vec(Map("InputCol"->"Input","MaxIter"->"10",
+    val wordToVec = Word2Vec(Map("InputCol"->"Input","MaxIter"->"10",
                                    "MaxSentenceLength"->"12", "NumPartitions"->"2",
                                    "OutputCol"->"feature","Seed"-> "12","VectorSize"->"10", "MinCount" ->"2","StepSize"->"12.0"))
-    word_to_vec.build()
+    wordToVec.build()
   }
   "Binarizer" should("build new binarizer")in {
-    val binarizer=Binarizer(Map("InputCol"->"Input","InputCols"->"col1 , col2 ,col3, col4",
-    "OutputCol" ->"Output",
-    "Threshold" -> "10.0",
-      "OutputCols" -> "Col10 , Col11 ,Col_12, Col_vector_1",
-      "Thresholds" -> "10.0 , 12.0 , 13.0"))
-    binarizer.build()
+    val Binariz=Binarizer(
+      Map("InputCol"->"Input",
+          "InputCols"->"col1 , col2 ,col3, col4",
+          "OutputCol" ->"Output",
+          "Threshold" -> "10.0",
+          "OutputCols" -> "Col10 , Col11 ,Col_12, Col_vector_1",
+          "Thresholds" -> "10.0 , 12.0 , 13.0"))
+    Binariz.build()
+  }
+  "BucketedRandomProjectionLSH" should("Build new BucketedRandomProjectionLSH")in {
+    val BucketRPLSH= BucketedRandomProjectionLSH(
+      Map("BucketLength"-> "10.0",
+          "InputCol"-> "Col1",
+          "NumHashTables"-> "1",
+          "OutputCol"-> "ColFinal",
+          "Seed"-> "12"))
+    BucketRPLSH.build()
+  }
+  "BucketedRandomProjectionLSHModel" should("Build new BucketedRandomProjectionLSHModel")in {
+    val BucketRPLSHModel= BucketedRandomProjectionLSHModel(
+      Map("BucketLength"-> "10.0",
+        "InputCol"-> "Col1",
+        "NumHashTables"-> "1",
+        "OutputCol"-> "ColFinal",
+        "Seed"-> "12"))
+    BucketRPLSHModel.build()
+  }
+  "Bucketizer" should("build new Bucketizer")in {
+    val Bucketiz=Bucketizer(
+      Map(
+        "OutputCol" ->"Output",
+        "HandleInvalid"-> "a",
+        "InputCols"-> "Col1,Col2,Col3",
+        "OutputCols"->"",
+        "Splits"->"10.0,12.0",
+        "SplitsArray"->"10.0, 12.0 ",
+        "InputCol"->"Input"))
+    Bucketiz.build()
   }
   "RegexTokenizer" should("Build new RegexTokenizer ")in {
     val RegexTokenize=RegexTokenizer(Map("Gaps"-> "false","InputCol"-> "Col1","MinTokenLength"->"1",
@@ -24,5 +56,25 @@ class CaraDatasetTest extends TestBase {
     "Pattern"->"*",
     "ToLowercase"->"true"))
     RegexTokenize.build()
+  }
+  "CountVectorizerModel" should ("Build new CountVectorizerModel")in {
+    val CountVModel = CountVectorizerModel(Map("Binary"->"true",
+      "InputCol"->"Col1",
+      "MaxDF"->"10.0",
+      "MinDF"->"2.0",
+      "MinTF"->"1.0",
+      "OutputCol"->"ColFinal",
+      "Vocabulary"-> "a,b,c,d"))
+    CountVModel.build()
+  }
+  "CountVectorizer" should ("Build new CountVectorizer")in {
+    val CountV = CountVectorizer(Map("Binary"->"true",
+      "InputCol"->"Col1",
+      "MaxDF"->"10.0",
+      "MinDF"->"2.0",
+      "MinTF"->"1.0",
+      "OutputCol"->"ColFinal",
+      "VocabSize"->"5"))
+    CountV.build()
   }
 }

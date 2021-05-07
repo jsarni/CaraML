@@ -10,25 +10,28 @@ case class CountVectorizerModel(Binary:Option[Boolean],
                                 MinDF:Option[Double],
                                 MinTF:Option[Double],
                                 OutputCol: Option[String],
-                                VocabSize: Option[Int]) extends CaraDataset {
+                                VocabSize: Option[Int],
+                                Vocabulary: Option[Array[String]]
+                               ) extends CaraDataset {
   @MapperConstructor
   def this(params: Map[String, String]) = {
-    this(
-      params.get("Binary").map(_.toBoolean),
+    this(params.get("Binary").map(_.toBoolean),
       params.get("InputCol").map(_.toString),
       params.get("MaxDF").map(_.toDouble),
       params.get("MinDF").map(_.toDouble),
       params.get("MinTF").map(_.toDouble),
       params.get("OutputCol").map(_.toString),
-      params.get("VocabSize").map(_.toInt)
+      params.get("VocabSize").map(_.toInt),
+      params.get("Vocabulary").map(_.toString.split(','))
     )
   }
 
   @Override
   def build(): PipelineStage = {
     // revoir plus tard le build : ne prend pas tous les setters, et revoir la paramètres du feature importé
-    val CountVectorizerModel=new fromSparkML("x",Array("xx"))
-    val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
+    val CountVectorizerModel=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
+    val ParamsToNotSet=List("Vocabulary","MaxDF","MinDF","VocabSize")
+    val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined).filter(f=> ! ParamsToNotSet.contains(f.getName) )
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values

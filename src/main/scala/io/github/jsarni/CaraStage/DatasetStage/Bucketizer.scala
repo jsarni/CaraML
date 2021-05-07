@@ -2,7 +2,7 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.feature.{Binarizer => fromSparkML}
+import org.apache.spark.ml.feature.{Bucketizer => fromSparkML}
 
 case class Bucketizer( HandleInvalid: Option[String],
                        InputCol:Option[String],
@@ -14,7 +14,7 @@ case class Bucketizer( HandleInvalid: Option[String],
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
-      params.get("HandleInvalid").map(_.toString),,
+      params.get("HandleInvalid").map(_.toString),
       params.get("InputCol").map(_.toString()),
       params.get("InputCols").map(_.split(',').map(_.trim)),
       params.get("OutputCol").map(_.toString),

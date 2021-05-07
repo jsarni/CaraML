@@ -2,8 +2,7 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.feature.{ChiSqSelectorModel => fromSparkML}
-import org.apache.spark.ml.feature.ChiSqSelector
+import org.apache.spark.ml.feature.{ChiSqSelector => fromSparkML}
 
 case class ChiSqSelectorModel(Fdr: Option[Double],
                               FeaturesCol:Option[String],
@@ -13,7 +12,8 @@ case class ChiSqSelectorModel(Fdr: Option[Double],
                               NumTopFeatures: Option[Int],
                               OutputCol: Option[String],
                               Percentile:Option[Double],
-                              SelectorType:Option[String]
+                              SelectorType:Option[String],
+                              SelectedFeatures: Option[Array[Int]]
 ) extends CaraDataset {
   @MapperConstructor
   def this(params: Map[String, String]) = {
@@ -26,12 +26,14 @@ case class ChiSqSelectorModel(Fdr: Option[Double],
       params.get("NumTopFeatures").map(_.toInt),
       params.get("OutputCol").map(_.toString),
       params.get("Percentile").map(_.toDouble),
-      params.get("SelectorType").map(_.toString)
+      params.get("SelectorType").map(_.toString),
+      params.get("SelectedFeatures").map(_.split(",").map(_.toInt))
     )
   }
 
   @Override
   def build(): PipelineStage = {
+    // revoir le Model : this.SelectedFeatures.getOrElse(Array.empty[Int])
     val Dataset_feature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
