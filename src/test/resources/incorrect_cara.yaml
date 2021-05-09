@@ -1,4 +1,4 @@
-model:
+CaraPipeline:
 - stage: LogisticRegression
   params:
     - MaxIter: 10
