@@ -1,0 +1,11 @@
+CaraPipeline:
+- stage: LogisticRegression
+  params:
+    - MaxIter: 10
+    - RegParam: 0.3
+    - ElasticNetParam: 0.1
+- stage: FeatureSelection
+  params:
+    - Param1: "S"
+    - Param2: 0.5
+    - Param3: false
