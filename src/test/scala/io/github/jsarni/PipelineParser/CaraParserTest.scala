@@ -1,111 +1,141 @@
 package io.github.jsarni.PipelineParser
 
+import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription}
+import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
+import io.github.jsarni.CaraYaml.CaraYaml
 import io.github.jsarni.TestBase
-import io.github.jsarni.CaraStage.CaraStageDescription
-import io.github.jsarni.CaraStage.ModelStage.TestStage
-import io.github.jsarni.CaraYaml.{DatasetYaml, ModelYaml}
-import org.codehaus.jackson.JsonNode
-import io.github.jsarni.PipelineParser.CaraParser
-
-import java.io.FileNotFoundException
-import scala.io.Source
+import org.apache.spark.ml.{Pipeline, PipelineStage}
+import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
 import scala.util.Try
 
 class CaraParserTest extends TestBase {
-  "loadFile" should "return parse the yaml description file to a json object" in {
-    val modelPath = getClass.getResource("/model.yaml").getPath
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
-
-    val datasetPath = getClass.getResource("/dataset.yaml").getPath
-    val datasetYaml = new DatasetYaml(datasetPath)
-    val datasetParser = new CaraParser(datasetYaml)
-
-    val loadFile = PrivateMethod[Try[JsonNode]]('loadFile)
-    val modelResult = modelParser.invokePrivate(loadFile())
-    val datasetResult = datasetParser.invokePrivate(loadFile())
-
-    modelResult.isSuccess shouldBe true
-    datasetResult.isSuccess shouldBe true
-  }
-
-  it should "Return an exception if the file does not exist" in {
-    val modelPath = "/inexisting_model.yaml"
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
-
-
-    val loadFile = PrivateMethod[Try[JsonNode]]('loadFile)
-    val modelResult = modelParser.invokePrivate(loadFile())
-
-    // TODO: Test on exception type
-    //    modelResult.get shouldBe isInstanceOf[FileNotFoundException]
-    modelResult.isFailure shouldBe true
-  }
-
-  it should "Return an exception if the file format is not correct" in {
-    val modelPath = getClass.getResource("/incorrect_model.yaml").getPath
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
-
-
-    val loadFile = PrivateMethod[Try[JsonNode]]('loadFile)
-    val modelResult = modelParser.invokePrivate(loadFile())
-
-    // TODO: Test on exception type
-    //    modelResult.get shouldBe isInstanceOf[FileNotFoundException]
-    modelResult.isFailure shouldBe true
-  }
 
   "extractStages" should "return parse the yaml description file to a json object" in {
-    val modelPath = getClass.getResource("/model.yaml").getPath
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
+    val caraPath = getClass.getResource("/cara.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
 
-    val loadFile = PrivateMethod[Try[JsonNode]]('loadFile)
-    val myJson = modelParser.invokePrivate(loadFile())
+    val myJson = caraYaml.loadFile()
 
-
-    val extractStages = PrivateMethod[List[CaraStageDescription]]('extractStages)
-    val result = modelParser.invokePrivate(extractStages(myJson.get))
+    val extractStages = PrivateMethod[Try[List[CaraStageDescription]]]('extractStages)
+    val result = caraParser.invokePrivate(extractStages(myJson.get))
 
     val expectedResult =
       Seq(
-        CaraStageDescription("LogisticRegression", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
+        CaraStageDescription("LogisticRegression", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")),
+        CaraStageDescription("FeatureSelection", Map("Param1" -> "S", "Param2" -> "0.5", "Param3" -> "false"))
       )
-    result should contain theSameElementsAs expectedResult
+
+    result.isSuccess shouldBe true
+    result.get should contain theSameElementsAs expectedResult
   }
 
 
-  "parseStage" should "return parse the yaml description file to a json object" in {
-    val modelPath = getClass.getResource("/model.yaml").getPath
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
+//  "parseStage" should "return parse the yaml description file to a json object" in {
+//    val caraPath = getClass.getResource("/cara.yaml").getPath
+//    val caraYaml = CaraYaml(caraPath)
+//    val caraParser = new CaraParser(caraYaml)
+//
+//
+//    val stageDesc =
+//      CaraStageDescription("TestStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
+//
+//    val res = caraParser.parseStage(stageDesc)
+//    print(res.get)
+//
+//  }
 
-    val stageDesc =
-      CaraStageDescription("TestStage", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1"))
-
-    val res = modelParser.parseStage(stageDesc)
-    print(res.get)
-
-  }
-
-  "parseStageMap" should "return parse the yaml description file to a json object" in {
-    val modelPath = getClass.getResource("/model.yaml").getPath
-    val modelYaml = new ModelYaml(modelPath)
-    val modelParser = new CaraParser(modelYaml)
+  "parseSingleStageMap" should "parse a CaraStageDescription to a CaraStage " in {
+    val caraPath = getClass.getResource("/cara.yaml").getPath
+    val caraParser = new CaraParser(CaraYaml(caraPath))
 
     val params = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
     val stageDesc =
-      CaraStageDescription("TestStage", params)
+      CaraStageDescription("LogisticRegression", params)
 
-    val res = modelParser.parseStageMap(stageDesc)
+    val parseSingleStageMap = PrivateMethod[Try[CaraStage]]('parseSingleStageMap)
 
+    val res = caraParser.invokePrivate(parseSingleStageMap(stageDesc))
 
-    res.isInstanceOf[TestStage] shouldBe true
-    res.asInstanceOf[TestStage].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
-    res.asInstanceOf[TestStage].RegParam shouldBe params.get("RegParam").map(_.toDouble)
-    res.asInstanceOf[TestStage].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
+    res.isSuccess shouldBe true
+    res.get.isInstanceOf[LogisticRegression] shouldBe true
+    res.get.asInstanceOf[LogisticRegression].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
+    res.get.asInstanceOf[LogisticRegression].RegParam shouldBe params.get("RegParam").map(_.toDouble)
+    res.get.asInstanceOf[LogisticRegression].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
+  }
 
+  "parseStages" should "parse a list of CaraStageDescription to the corresponding list of CaraStage" in {
+    val caraPath = getClass.getResource("/cara.yaml").getPath
+    val caraParser = new CaraParser(CaraYaml(caraPath))
+
+    val params1 = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
+    val params2 = Map("MaxIter" -> "20", "FitIntercept" -> "False", "ProbabilityCol" -> "col1")
+    val stagesDesc = List(
+      CaraStageDescription("LogisticRegression", params1),
+      CaraStageDescription("LogisticRegression", params2)
+    )
+
+    val expectedResult = List(LogisticRegression(params1), LogisticRegression(params2))
+
+    val parseStages = PrivateMethod[Try[List[CaraStage]]]('parseStages)
+    val res = caraParser.invokePrivate(parseStages(stagesDesc))
+
+    res.isSuccess shouldBe true
+    res.get should contain theSameElementsAs expectedResult
+  }
+
+  "buildStages" should "build a list PipelineStages out of a list of CaraStages" in {
+    val caraPath = getClass.getResource("/cara.yaml").getPath
+    val caraParser = new CaraParser(CaraYaml(caraPath))
+
+    val params1 = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
+    val params2 = Map("MaxIter" -> "20", "FitIntercept" -> "False", "ProbabilityCol" -> "col1")
+    val stagesList = List(
+      LogisticRegression(params1), LogisticRegression(params2)
+    )
+
+    val expectedResult = List(
+      new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1),
+      new SparkLR().setMaxIter(20).setFitIntercept(false).setProbabilityCol("col1")
+    )
+
+    val buildStages = PrivateMethod[Try[List[PipelineStage]]]('buildStages)
+    val res = caraParser.invokePrivate(buildStages(stagesList))
+
+    res.isSuccess shouldBe true
+
+    val resParameters = res.get.map(_.extractParamMap().toSeq.map(_.value))
+    val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
+
+    resParameters.head should contain theSameElementsAs expectedParameters.head
+    resParameters(1) should contain theSameElementsAs expectedParameters(1)
+  }
+
+  "buildPipeline" should "build a Spark ML Pipeline out of a list of PipelineStages" in {
+    val caraPath = getClass.getResource("/cara.yaml").getPath
+    val caraParser = new CaraParser(CaraYaml(caraPath))
+
+    val stagesList = List(
+      new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)
+    )
+
+    val buildPipeline = PrivateMethod[Try[Pipeline]]('buildPipeline)
+    val res = caraParser.invokePrivate(buildPipeline(stagesList))
+
+    res.isSuccess shouldBe true
+    res.get.getStages shouldBe new Pipeline().setStages(stagesList.toArray).getStages
+  }
+
+  "parse" should "build the described Pipeline of the Yaml File" in {
+    val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val res = caraParser.parse()
+    val exprectedRes = new Pipeline().setStages(Array(new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)))
+
+    res.isSuccess shouldBe true
+    res.get.getStages.map(_.extractParamMap().toSeq.map(_.value)).head should contain theSameElementsAs
+      exprectedRes.getStages.map(_.extractParamMap().toSeq.map(_.value)).head
   }
 }
