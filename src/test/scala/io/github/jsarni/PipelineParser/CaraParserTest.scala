@@ -2,7 +2,7 @@ package io.github.jsarni.PipelineParser
 
 import io.github.jsarni.TestBase
 import io.github.jsarni.CaraStage.CaraStageDescription
-import io.github.jsarni.CaraStage.ModelStage.{TestStage, LogisticRegression}
+import io.github.jsarni.CaraStage.ModelStage.{ LogisticRegression}
 import io.github.jsarni.CaraYaml.{DatasetYaml, ModelYaml}
 import org.codehaus.jackson.JsonNode
 import io.github.jsarni.PipelineParser.CaraParser
@@ -102,22 +102,6 @@ class CaraParserTest extends TestBase {
     val res = modelParser.parseStageMap(stageDesc)
 
 
-    res.isInstanceOf[TestStage] shouldBe true
-    res.asInstanceOf[TestStage].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
-    res.asInstanceOf[TestStage].RegParam shouldBe params.get("RegParam").map(_.toDouble)
-    res.asInstanceOf[TestStage].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
-
   }
-  "LogisticRegression" should("Create an lr model and set all parameters with there args values") in {
-    val basicParams = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1", "Family" -> "multinomial")
-    val allParams = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1", "Family" -> "multinomial" ,"FeaturesCol" -> "FeatureColname"
-      , "FitIntercept" -> "True", "PredictionCol" -> "Age", "ProbabilityCol" -> "ProbaColname", "RawPredictionCol"-> "RawPredictColname"
-      , "Standardization" -> "True" , "Tol" -> "0.13", "WeightCol" -> "WeightColname")
 
-    val lr = LogisticRegression( basicParams)
-    val lr1 = LogisticRegression( allParams)
-    lr.build()
-    lr1.build()
-
-  }
 }

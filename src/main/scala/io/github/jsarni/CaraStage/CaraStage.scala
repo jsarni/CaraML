@@ -1,11 +1,12 @@
 package io.github.jsarni.CaraStage
 
 import org.apache.spark.ml.PipelineStage
+import scala.util.Try
 
 trait CaraStage {
 
   //TODO: Add builder function
-  def build(): PipelineStage
+  def build(): Try[PipelineStage]
 
   // Function to get methode by name and do invoke with the right params types and values
   def GetMethode(lr : PipelineStage, field : Any, field_name : String)  = {
