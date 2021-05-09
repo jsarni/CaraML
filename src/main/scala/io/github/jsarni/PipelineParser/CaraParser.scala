@@ -15,14 +15,14 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
   def parse(): Try[Pipeline] = {
     for {
       content <- contentTry
-      stagesDescriptions = extractStages(content)
-      caraStages = parseStages(stagesDescriptions)
-      sparkStages = buildStages(caraStages)
-      pipeline = buildPipeline(sparkStages)
+      stagesDescriptions <- extractStages(content)
+      caraStages <- parseStages(stagesDescriptions)
+      sparkStages <- buildStages(caraStages)
+      pipeline <- buildPipeline(sparkStages)
     } yield pipeline
   }
 
-  private[PipelineParser] def extractStages(fileContent: JsonNode): List[CaraStageDescription] = {
+  private[PipelineParser] def extractStages(fileContent: JsonNode): Try[List[CaraStageDescription]] = Try {
     val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList
     val stages = stagesList.map{
       stageDesc =>
@@ -57,21 +57,22 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
       caraStage = constructor.newInstance(stageDescription.params)
     } yield caraStage
 
-  private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): CaraStage = {
+  private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): Try[CaraStage] = {
     mapStage(stageDescription)
   }
 
-  private[PipelineParser] def parseStages(stagesDescriptionsList: List[CaraStageDescription]): List[CaraStage] = {
-    stagesDescriptionsList.map(parseSingleStageMap(_))
+  private[PipelineParser] def parseStages(stagesDescriptionsList: List[CaraStageDescription]): Try[List[CaraStage]] = {
+    Try(stagesDescriptionsList.map(parseSingleStageMap(_).get))
   }
 
-  private[PipelineParser] def buildStages(stagesList: List[CaraStage]): List[PipelineStage] = {
-    stagesList.map(_.build())
+  private[PipelineParser] def buildStages(stagesList: List[CaraStage]): Try[List[PipelineStage]] = {
+    Try(stagesList.map(_.build()))
   }
 
-  private[PipelineParser] def buildPipeline(mlStages: List[PipelineStage]) = {
-    new Pipeline()
+  private[PipelineParser] def buildPipeline(mlStages: List[PipelineStage]): Try[Pipeline] = {
+    Try(new Pipeline()
       .setStages(mlStages.toArray)
+    )
   }
 
 }

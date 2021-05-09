@@ -7,7 +7,7 @@ import scala.util.Try
 
 trait CaraStageMapper {
 
-  def mapStage(stageDescription: CaraStageDescription): CaraStage = {
+  def mapStage(stageDescription: CaraStageDescription): Try[CaraStage] = Try {
     Try(mapModelStage(stageDescription)).getOrElse(mapDatasetStage(stageDescription))
   }
 

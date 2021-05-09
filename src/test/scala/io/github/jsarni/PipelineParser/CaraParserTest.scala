@@ -6,6 +6,7 @@ import io.github.jsarni.CaraYaml.CaraYaml
 import io.github.jsarni.TestBase
 import org.apache.spark.ml.{Pipeline, PipelineStage}
 import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
+import scala.util.Try
 
 class CaraParserTest extends TestBase {
 
@@ -16,7 +17,7 @@ class CaraParserTest extends TestBase {
 
     val myJson = caraYaml.loadFile()
 
-    val extractStages = PrivateMethod[List[CaraStageDescription]]('extractStages)
+    val extractStages = PrivateMethod[Try[List[CaraStageDescription]]]('extractStages)
     val result = caraParser.invokePrivate(extractStages(myJson.get))
 
     val expectedResult =
@@ -25,7 +26,8 @@ class CaraParserTest extends TestBase {
         CaraStageDescription("FeatureSelection", Map("Param1" -> "S", "Param2" -> "0.5", "Param3" -> "false"))
       )
 
-    result should contain theSameElementsAs expectedResult
+    result.isSuccess shouldBe true
+    result.get should contain theSameElementsAs expectedResult
   }
 
 
@@ -51,14 +53,15 @@ class CaraParserTest extends TestBase {
     val stageDesc =
       CaraStageDescription("LogisticRegression", params)
 
-    val parseSingleStageMap = PrivateMethod[CaraStage]('parseSingleStageMap)
+    val parseSingleStageMap = PrivateMethod[Try[CaraStage]]('parseSingleStageMap)
 
     val res = caraParser.invokePrivate(parseSingleStageMap(stageDesc))
 
-    res.isInstanceOf[LogisticRegression] shouldBe true
-    res.asInstanceOf[LogisticRegression].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
-    res.asInstanceOf[LogisticRegression].RegParam shouldBe params.get("RegParam").map(_.toDouble)
-    res.asInstanceOf[LogisticRegression].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
+    res.isSuccess shouldBe true
+    res.get.isInstanceOf[LogisticRegression] shouldBe true
+    res.get.asInstanceOf[LogisticRegression].MaxIter shouldBe params.get("MaxIter").map(_.toInt)
+    res.get.asInstanceOf[LogisticRegression].RegParam shouldBe params.get("RegParam").map(_.toDouble)
+    res.get.asInstanceOf[LogisticRegression].ElasticNetParam shouldBe params.get("ElasticNetParam").map(_.toDouble)
   }
 
   "parseStages" should "parse a list of CaraStageDescription to the corresponding list of CaraStage" in {
@@ -74,10 +77,11 @@ class CaraParserTest extends TestBase {
 
     val expectedResult = List(LogisticRegression(params1), LogisticRegression(params2))
 
-    val parseStages = PrivateMethod[List[CaraStage]]('parseStages)
+    val parseStages = PrivateMethod[Try[List[CaraStage]]]('parseStages)
     val res = caraParser.invokePrivate(parseStages(stagesDesc))
 
-    res should contain theSameElementsAs expectedResult
+    res.isSuccess shouldBe true
+    res.get should contain theSameElementsAs expectedResult
   }
 
   "buildStages" should "build a list PipelineStages out of a list of CaraStages" in {
@@ -95,10 +99,12 @@ class CaraParserTest extends TestBase {
       new SparkLR().setMaxIter(20).setFitIntercept(false).setProbabilityCol("col1")
     )
 
-    val buildStages = PrivateMethod[List[PipelineStage]]('buildStages)
+    val buildStages = PrivateMethod[Try[List[PipelineStage]]]('buildStages)
     val res = caraParser.invokePrivate(buildStages(stagesList))
 
-    val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
+    res.isSuccess shouldBe true
+
+    val resParameters = res.get.map(_.extractParamMap().toSeq.map(_.value))
     val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
@@ -113,13 +119,23 @@ class CaraParserTest extends TestBase {
       new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)
     )
 
-    val buildPipeline = PrivateMethod[Pipeline]('buildPipeline)
+    val buildPipeline = PrivateMethod[Try[Pipeline]]('buildPipeline)
     val res = caraParser.invokePrivate(buildPipeline(stagesList))
 
-    res.getStages shouldBe new Pipeline().setStages(stagesList.toArray).getStages
+    res.isSuccess shouldBe true
+    res.get.getStages shouldBe new Pipeline().setStages(stagesList.toArray).getStages
   }
 
   "parse" should "build the described Pipeline of the Yaml File" in {
-    // TODO - Write test
+    val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val res = caraParser.parse()
+    val exprectedRes = new Pipeline().setStages(Array(new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)))
+
+    res.isSuccess shouldBe true
+    res.get.getStages.map(_.extractParamMap().toSeq.map(_.value)).head should contain theSameElementsAs
+      exprectedRes.getStages.map(_.extractParamMap().toSeq.map(_.value)).head
   }
 }
