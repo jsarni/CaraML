@@ -66,7 +66,7 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
   }
 
   private[PipelineParser] def buildStages(stagesList: List[CaraStage]): Try[List[PipelineStage]] = {
-    Try(stagesList.map(_.build()))
+    Try(stagesList.map(_.build().get))
   }
 
   private[PipelineParser] def buildPipeline(mlStages: List[PipelineStage]): Try[Pipeline] = {

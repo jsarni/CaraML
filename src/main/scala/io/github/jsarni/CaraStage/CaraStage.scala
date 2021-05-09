@@ -26,8 +26,8 @@ trait CaraStage {
       case _ : java.lang.Short     =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Short].getClass )
       case _ : java.lang.Character =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Char].getClass )
       case _ : java.lang.Byte      =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Byte].getClass )
-      case _ :java.lang.Long       =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Long].getClass)
-      case _: java.lang.Integer    =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Int].getClass)
+      case _ : java.lang.Long      =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Long].getClass)
+      case _ : java.lang.Integer   =>   lr.getClass.getMethod(MethodeName, field.asInstanceOf[Int].getClass)
       case _ : java.lang.String    =>   lr.getClass.getMethod(MethodeName, field.getClass )
     }
   }
