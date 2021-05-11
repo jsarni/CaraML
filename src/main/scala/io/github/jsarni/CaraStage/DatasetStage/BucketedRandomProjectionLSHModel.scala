@@ -3,7 +3,9 @@ package io.github.jsarni.CaraStage.DatasetStage
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{BucketedRandomProjectionLSH => fromSparkML}
-import org.apache.spark.ml.linalg.{Vector,Vectors}
+import org.apache.spark.ml.linalg.{Vector, Vectors}
+
+import scala.util.Try
 
 case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
                                             InputCol: Option[String],
@@ -24,7 +26,8 @@ case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
+    val randUnitVectors = Array(Vectors.dense(10,10))
     //revoir cet import : Array(Vectors.dense(1.0,2.0))
     val Dataset_feature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

@@ -2,7 +2,9 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.feature.{CountVectorizerModel=>fromSparkML}
+import org.apache.spark.ml.feature.{CountVectorizerModel => fromSparkML}
+
+import scala.util.Try
 
 case class CountVectorizerModel(Binary:Option[Boolean],
                                 InputCol:Option[String],
@@ -27,7 +29,7 @@ case class CountVectorizerModel(Binary:Option[Boolean],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     // revoir plus tard le build : ne prend pas tous les setters, et revoir la paramètres du feature importé
     val CountVectorizerModel=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
     val ParamsToNotSet=List("Vocabulary","MaxDF","MinDF","VocabSize")

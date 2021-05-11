@@ -3,6 +3,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{HashingTF => fromSparkML}
 
+import scala.util.Try
+
 case class HashingTF(Binary:Option[Boolean],
                      InputCol:Option[String],
                      NumFeatures:Option[Int],
@@ -18,7 +20,7 @@ case class HashingTF(Binary:Option[Boolean],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val HashingTF=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

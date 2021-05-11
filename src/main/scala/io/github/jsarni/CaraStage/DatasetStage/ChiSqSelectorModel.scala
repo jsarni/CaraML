@@ -4,6 +4,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{ChiSqSelector => fromSparkML}
 
+import scala.util.Try
+
 case class ChiSqSelectorModel(Fdr: Option[Double],
                               FeaturesCol:Option[String],
                               Fpr: Option[Double],
@@ -32,7 +34,7 @@ case class ChiSqSelectorModel(Fdr: Option[Double],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     // revoir le Model : this.SelectedFeatures.getOrElse(Array.empty[Int])
     val Dataset_feature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

@@ -3,6 +3,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{RegexTokenizer => fromSparkML}
 
+import scala.util.Try
+
 case class RegexTokenizer(Gaps:Option[Boolean],
                           InputCol:Option[String],
                           MinTokenLength: Option[Int],
@@ -22,7 +24,7 @@ case class RegexTokenizer(Gaps:Option[Boolean],
     )
   }
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val RegxTokenizer=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

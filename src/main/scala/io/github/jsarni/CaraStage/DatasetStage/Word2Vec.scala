@@ -4,6 +4,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.feature.{Word2Vec => fromSparkML}
 import org.apache.spark.ml.PipelineStage
 
+import scala.util.Try
+
 case class Word2Vec (InputCol: Option[String],
                     MaxIter: Option[Int],
                     MaxSentenceLength:Option[Int],
@@ -31,7 +33,7 @@ case class Word2Vec (InputCol: Option[String],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val word_to_vec=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

@@ -10,16 +10,7 @@ class CaraDatasetTest extends TestBase {
                                    "OutputCol"->"feature","Seed"-> "12","VectorSize"->"10", "MinCount" ->"2","StepSize"->"12.0"))
     wordToVec.build()
   }
-  "Binarizer" should("build new binarizer")in {
-    val Binariz=Binarizer(
-      Map("InputCol"->"Input",
-          "InputCols"->"col1 , col2 ,col3, col4",
-          "OutputCol" ->"Output",
-          "Threshold" -> "10.0",
-          "OutputCols" -> "Col10 , Col11 ,Col_12, Col_vector_1",
-          "Thresholds" -> "10.0 , 12.0 , 13.0"))
-    Binariz.build()
-  }
+
   "BucketedRandomProjectionLSH" should("Build new BucketedRandomProjectionLSH")in {
     val BucketRPLSH= BucketedRandomProjectionLSH(
       Map("BucketLength"-> "10.0",

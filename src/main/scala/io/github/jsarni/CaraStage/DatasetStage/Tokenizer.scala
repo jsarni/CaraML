@@ -2,9 +2,12 @@ package io.github.jsarni.CaraStage.DatasetStage
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{Tokenizer => fromSparkML}
+
+import scala.util.Try
 case class Tokenizer(InputCol:Option[String],
                      OutputCol: Option[String])
   extends CaraDataset {
+
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -13,7 +16,7 @@ case class Tokenizer(InputCol:Option[String],
     )
   }
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val Tokenizer=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

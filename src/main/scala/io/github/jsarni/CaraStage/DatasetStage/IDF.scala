@@ -3,6 +3,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{IDF => fromSparkML}
 
+import scala.util.Try
+
 case class IDF(InputCol:Option[String],
                MinDocFreq:Option[Int],
                OutputCol: Option[String])
@@ -16,7 +18,7 @@ case class IDF(InputCol:Option[String],
     )
   }
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val Idf=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

@@ -4,13 +4,16 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{Bucketizer => fromSparkML}
 
-case class Bucketizer( HandleInvalid: Option[String],
+import scala.util.Try
+
+case class Bucketizer( HandleInvalid: Option[String]=Option("error"),
                        InputCol:Option[String],
                        InputCols:Option[Array[String]],
                        OutputCol: Option[String],
                        OutputCols: Option[Array[String]],
-                       Splits: Option[Array[Double]],
-                       SplitsArray: Option[Array[Double]]) extends CaraDataset {
+                       Splits: Option[Array[Double]]
+                      ,SplitsArray: Option[Array[Array[Double]]]
+                     ) extends CaraDataset {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -19,13 +22,13 @@ case class Bucketizer( HandleInvalid: Option[String],
       params.get("InputCols").map(_.split(',').map(_.trim)),
       params.get("OutputCol").map(_.toString),
       params.get("OutputCols").map(_.toString.split(',').map(_.trim)),
-      params.get("Splits").map(_.split(",").map(_.toDouble)),
-      params.get("SplitsArray").map(_.split(",").map(_.toDouble))
+      params.get("Splits").map(_.split(",").map(_.toDouble))
+      ,params.get("SplitsArray").map(_.split(';').map(_.split(',').map(_.toDouble)))
     )
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val Dataset_feature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

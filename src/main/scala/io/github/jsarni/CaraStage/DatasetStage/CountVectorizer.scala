@@ -4,6 +4,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{CountVectorizer => fromSparkML}
 
+import scala.util.Try
+
 case class CountVectorizer(Binary:Option[Boolean],
                            InputCol:Option[String],
                            MaxDF:Option[Double],
@@ -11,6 +13,7 @@ case class CountVectorizer(Binary:Option[Boolean],
                            MinTF:Option[Double],
                            OutputCol: Option[String],
                            VocabSize: Option[Int]) extends CaraDataset {
+
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -25,7 +28,7 @@ case class CountVectorizer(Binary:Option[Boolean],
   }
 
   @Override
-  def build(): PipelineStage = {
+  def build(): Try[PipelineStage] = Try{
     val CountVectorizer=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)

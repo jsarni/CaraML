@@ -3,6 +3,8 @@ import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.classification.{LogisticRegression => log}
 
+import scala.util.Try
+
 
 
 case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], ElasticNetParam: Option[Double], Family:Option[String],FeaturesCol: Option[String]
@@ -31,7 +33,7 @@ case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], El
     )
   }
 
-  override def build(): PipelineStage = {
+  override def build(): Try[PipelineStage] = Try{
     val lr = new log()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
