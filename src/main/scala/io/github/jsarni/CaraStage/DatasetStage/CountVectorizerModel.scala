@@ -30,16 +30,17 @@ case class CountVectorizerModel(Binary:Option[Boolean],
 
   @Override
   def build(): Try[PipelineStage] = Try{
-    // revoir plus tard le build : ne prend pas tous les setters, et revoir la paramètres du feature importé
-    val CountVectorizerModel=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
+
+    val Dataset_feature=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
     val ParamsToNotSet=List("Vocabulary","MaxDF","MinDF","VocabSize")
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined).filter(f=> ! ParamsToNotSet.contains(f.getName) )
     val names = definedFields.map(f => f.getName)
+    println(names)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  GetMethode(CountVectorizerModel,f._2 match {case Some(s) => s },f._1).invoke(CountVectorizerModel,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    zipFields.map(f=>  GetMethode(Dataset_feature,f._2 match {case Some(s) => s },f._1).invoke(Dataset_feature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
     println("Succesfull")
-    CountVectorizerModel
+    Dataset_feature
   }
 }
 
