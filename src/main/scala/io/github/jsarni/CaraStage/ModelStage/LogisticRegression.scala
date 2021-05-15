@@ -1,7 +1,8 @@
 package io.github.jsarni.CaraStage.ModelStage
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.classification.{LogisticRegression => log}
+import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
+import scala.util.Try
 
 
 
@@ -17,27 +18,27 @@ case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], El
       params.get("MaxIter").map(_.toInt),
       params.get("RegParam").map(_.toDouble),
       params.get("ElasticNetParam").map(_.toDouble),
-      params.get("Family").map(_.toString),
-      params.get("FeaturesCol").map(_.toString),
+      params.get("Family"),
+      params.get("FeaturesCol"),
       params.get("FitIntercept").map(_.toBoolean),
-      params.get("PredictionCol").map(_.toString),
-      params.get("ProbabilityCol").map(_.toString),
-      params.get("RawPredictionCol").map(_.toString),
+      params.get("PredictionCol"),
+      params.get("ProbabilityCol"),
+      params.get("RawPredictionCol"),
       params.get("Standardization").map(_.toBoolean),
       params.get("Thresholds").map(_.split(",").map(_.toDouble)),
       params.get("Tol").map(_.toDouble),
-      params.get("WeightCol").map(_.toString)
+      params.get("WeightCol")
 
     )
   }
 
-  override def build(): PipelineStage = {
-    val lr = new log()
+  override def build(): Try[PipelineStage] = Try {
+    val lr = new SparkLR()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  GetMethode(lr,f._2 match {case Some(s) => s },f._1).invoke(lr,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    zipFields.map(f=>  getMethode(lr,f._2 match {case Some(s) => s },f._1).invoke(lr,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
     lr
 
   }
