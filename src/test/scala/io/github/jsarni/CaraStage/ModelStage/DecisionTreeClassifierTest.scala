@@ -11,7 +11,6 @@ class DecisionTreeClassifierTest extends TestBase {
         "FeaturesCol" -> "FeatureCol",
         "Impurity" -> "entropy",
         "LabelCol" -> "LabelCol",
-        "FeaturesCol" -> "FeatureColname",
         "LeafCol" -> "LeafCol",
         "MaxBins" -> "10",
         "MaxDepth" -> "5",
@@ -51,7 +50,7 @@ class DecisionTreeClassifierTest extends TestBase {
           .setThresholds(Array(0.2, 0.04))
 
       )
-//      dTree.build().isSuccess shouldBe true
+      dTree.build().isSuccess shouldBe true
 
       val res = List(dTree.build().get)
       val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
@@ -71,7 +70,6 @@ class DecisionTreeClassifierTest extends TestBase {
         "FeaturesCol" -> "FeatureCol",
         "Impurity" -> "entropy",
         "LabelCol" -> "LabelCol",
-        "FeaturesCol" -> "FeatureColname",
         "LeafCol" -> "LeafCol",
         "MaxBins" -> "10",
         "MaxDepth" -> "5",
