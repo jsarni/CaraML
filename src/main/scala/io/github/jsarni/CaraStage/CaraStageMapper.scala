@@ -3,6 +3,8 @@ package io.github.jsarni.CaraStage
 import io.github.jsarni.CaraStage.DatasetStage.CaraDataset
 import io.github.jsarni.CaraStage.ModelStage._
 
+import org.apache.spark.ml.evaluation._
+
 import scala.util.Try
 
 trait CaraStageMapper {
@@ -24,6 +26,15 @@ trait CaraStageMapper {
       case _ =>
         throw
           new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
+    }
+  }
+
+  def mapEvaluator(evaluatorName: String): Evaluator = {
+    evaluatorName match {
+      case "RegressionEvaluator" => new RegressionEvaluator()
+      case _ =>
+        throw
+          new Exception(s"${evaluatorName} is not a valid SparkML Validator name. Please verify your Yaml File")
     }
   }
 
