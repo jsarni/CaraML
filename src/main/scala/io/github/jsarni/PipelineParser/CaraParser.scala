@@ -76,3 +76,7 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
   }
 
 }
+
+object CaraParser {
+  def apply(caraYaml: CaraYaml): CaraParser = new CaraParser(caraYaml)
+}
