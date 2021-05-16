@@ -12,6 +12,7 @@ trait CaraStage {
   def getMethode(stage : PipelineStage, field : Any, fieldName : String): Method = {
     val methodeName = "set" + fieldName
     field match {
+      case _ : Any  if field.getClass == Array[Boolean]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Boolean]].getClass )
       case _ : Any  if field.getClass == Array[Double]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Double]].getClass )
       case _ : Any  if field.getClass == Array[String]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[String]].getClass )
       case _ : Any  if field.getClass == Array[Float]().getClass   =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Float]].getClass )

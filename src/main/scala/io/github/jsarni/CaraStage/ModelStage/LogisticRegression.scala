@@ -1,7 +1,7 @@
 package io.github.jsarni.CaraStage.ModelStage
 import io.github.jsarni.CaraStage.Annotation.MapperConstructor
 import org.apache.spark.ml.PipelineStage
-import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
+import org.apache.spark.ml.classification.{LogisticRegression => SparkML}
 import scala.util.Try
 
 
@@ -33,14 +33,18 @@ case class LogisticRegression(MaxIter: Option[Int], RegParam: Option[Double], El
   }
 
   override def build(): Try[PipelineStage] = Try {
-    val lr = new SparkLR()
+    val model = new SparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  getMethode(lr,f._2 match {case Some(s) => s },f._1).invoke(lr,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
-    lr
-
+    zipFields.map { f =>
+      val fieldName = f._1
+      val fieldValue = f._2 match {case Some(s) => s }
+      getMethode(model,fieldValue,fieldName)
+        .invoke(model,fieldValue.asInstanceOf[f._2.type])
+    }
+    model
   }
 }
 object LogisticRegression {
