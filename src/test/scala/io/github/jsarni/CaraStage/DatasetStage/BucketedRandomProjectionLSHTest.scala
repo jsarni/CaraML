@@ -6,7 +6,7 @@ import scala.util.Try
 import io.github.jsarni.TestBase
 
 class BucketedRandomProjectionLSHTest extends TestBase {
-"Build BucketedRandomProjectionLSH" should("Build BucketedRandomProjectionLSH with the parametres given and be the same of Spark ML BucketedRandomProjectionLSH") in {
+"BucketedRandomProjectionLSH build Success" should "Build BucketedRandomProjectionLSH with the parametres given and be the same of Spark ML BucketedRandomProjectionLSH" in {
     val CaraDsFeature = new BucketedRandomProjectionLSH(
       Map("BucketLength"-> "10.0",
       "InputCol"->"Col_Input",

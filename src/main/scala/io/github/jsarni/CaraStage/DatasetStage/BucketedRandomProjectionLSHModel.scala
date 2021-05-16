@@ -28,16 +28,15 @@ case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
   @Override
   def build(): Try[PipelineStage] = Try{
     val randUnitVectors = Array(Vectors.dense(10,10))
-    //revoir cet import : Array(Vectors.dense(1.0,2.0))
-    val Dataset_feature=new fromSparkML()
+    val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
 
-    zipFields.map(f=>  GetMethode(Dataset_feature,f._2 match {case Some(s) => s },f._1).invoke(Dataset_feature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
-    println("Succesfull")
-    Dataset_feature
+    zipFields.map(f=>  getMethode(datasetFeature,f._2 match {case Some(s) => s },f._1)
+             .invoke(datasetFeature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    datasetFeature
   }
 }
 object BucketedRandomProjectionLSHModel {

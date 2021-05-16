@@ -5,7 +5,7 @@ import org.apache.spark.ml.feature.{ChiSqSelector => fromSparkML}
 import java.lang.reflect.InvocationTargetException
 
 class ChiSqSelectorTest extends TestBase {
-"ChiSqSelector build success" should "build new ChiSqSelector from given parameters, and must be the same with SparkML ChiSqSelector" in {
+"ChiSqSelector build Success" should "build new ChiSqSelector from given parameters, and must be the same with SparkML ChiSqSelector" in {
 
   val CaraDsFeature=ChiSqSelector(
     Map ("Fdr"->"0.01",
@@ -30,12 +30,11 @@ class ChiSqSelectorTest extends TestBase {
     .setSelectorType("fpr")
 
   val CaraDsParams= CaraDsFeature.build().get.extractParamMap.toSeq.map(_.value).toList
-
   val SparkParams = SparkFeature.extractParamMap().toSeq.map(_.value).toList
   CaraDsParams should contain theSameElementsAs  SparkParams
 
 }
-  "ChiSqSelector build failure" should "fail to build new ChiSqSelector with wrong parameters" in {
+  "ChiSqSelector build Failure" should "fail to build new ChiSqSelector with wrong parameters" in {
     an [InvocationTargetException] must be thrownBy ChiSqSelector(
       Map ("Fdr"->"10.0",
         "FeaturesCol"->"Input",

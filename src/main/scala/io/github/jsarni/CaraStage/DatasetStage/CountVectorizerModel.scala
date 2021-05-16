@@ -31,16 +31,18 @@ case class CountVectorizerModel(Binary:Option[Boolean],
   @Override
   def build(): Try[PipelineStage] = Try{
 
-    val Dataset_feature=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
+    val datasetFeature=new fromSparkML(this.Vocabulary.getOrElse(Array.empty[String]))
     val ParamsToNotSet=List("Vocabulary","MaxDF","MinDF","VocabSize")
-    val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined).filter(f=> ! ParamsToNotSet.contains(f.getName) )
+    val definedFields = this.getClass.getDeclaredFields
+                                      .filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
+                                      .filter(f=> ! ParamsToNotSet.contains(f.getName) )
     val names = definedFields.map(f => f.getName)
     println(names)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  GetMethode(Dataset_feature,f._2 match {case Some(s) => s },f._1).invoke(Dataset_feature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
-    println("Succesfull")
-    Dataset_feature
+    zipFields.map(f=>  getMethode(datasetFeature,f._2 match {case Some(s) => s },f._1)
+             .invoke(datasetFeature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    datasetFeature
   }
 }
 

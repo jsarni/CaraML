@@ -27,17 +27,17 @@ case class Binarizer(InputCol:Option[String],
 
   @Override
   def build(): Try[PipelineStage]= Try{
-    val Binarize=new fromSparkML()
-    val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
+    val datasetFeature=new fromSparkML()
+    val definedFields = this.getClass.getDeclaredFields
+                            .filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  GetMethode(Binarize,f._2 match {case Some(s) => s },f._1).invoke(Binarize,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
-    Binarize
+    zipFields.map(f=>  getMethode(datasetFeature,f._2 match {case Some(s) => s },f._1)
+             .invoke(datasetFeature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    datasetFeature
   }
 }
 object Binarizer{
   def apply(params: Map[String,String]): Binarizer = new Binarizer(params)
 }
-
-

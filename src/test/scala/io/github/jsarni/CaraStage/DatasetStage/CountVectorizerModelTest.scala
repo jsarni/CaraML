@@ -6,10 +6,9 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.IllegalArgumentException
 
 class CountVectorizerModelTest extends TestBase {
-  "CountVectorizerModel build success" should "build new CountVectorizerModel from given parameters and return the same args as SparkML CountVectorizerModel" in {
+  "CountVectorizerModel build Success" should "build new CountVectorizerModel from given parameters and return the same args as SparkML CountVectorizerModel" in {
     val CaraDsFeature=CountVectorizer(
-      Map (
-        "Binary"->"true",
+      Map ("Binary"->"true",
         "InputCol"->"Input",
         "VocabSize"->"3",
         "OutputCol" -> "Col10"
@@ -25,13 +24,11 @@ class CountVectorizerModelTest extends TestBase {
       .setOutputCol("Col10")
 
     val CaraDsParams= CaraDsFeature.build().get.extractParamMap.toSeq.map(_.value).toList
-    println(CaraDsFeature.build().get.extractParamMap().toSeq.map(f=>(f.param.toString.split("__")(1),f.value)).sortBy(_._1))
-    println(SparkFeature.extractParamMap().toSeq.map(f=>(f.param.toString.split("__")(1),f.value)).sortBy(_._1))
     val SparkParams = SparkFeature.extractParamMap().toSeq.map(_.value).toList
     CaraDsParams should contain theSameElementsAs  SparkParams
 
   }
-  "CountVectorizer build failure" should "fail to build CountVectorizer with wrong parameters" in {
+  "CountVectorizer build Failure" should "fail to build CountVectorizer with wrong parameters" in {
     println("Binary  parameter must be Boolean ")
     an [IllegalArgumentException] must be thrownBy CountVectorizer(
       Map ("Binary"->"OK",

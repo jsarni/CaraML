@@ -19,14 +19,14 @@ case class IDF(InputCol:Option[String],
   }
   @Override
   def build(): Try[PipelineStage] = Try{
-    val Idf=new fromSparkML()
+    val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
     val names = definedFields.map(f => f.getName)
     val values = definedFields.map(f => f.get(this))
     val zipFields = names zip values
-    zipFields.map(f=>  GetMethode(Idf,f._2 match {case Some(s) => s },f._1).invoke(Idf,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
-    println("Succesfull")
-    Idf
+    zipFields.map(f=>  getMethode(datasetFeature,f._2 match {case Some(s) => s },f._1)
+             .invoke(datasetFeature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] })))
+    datasetFeature
   }
 }
 object IDF {

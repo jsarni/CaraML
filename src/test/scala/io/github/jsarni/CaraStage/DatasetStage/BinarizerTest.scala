@@ -5,7 +5,7 @@ import scala.util.{Try,Success,Failure}
 import java.lang.NumberFormatException
 
 class BinarizerTest extends TestBase {
-  "Binarizer Build Success" should("build new binarizer with parametres given on the Map and be the same with SparkMl Binarizer")in {
+  "Binarizer build Success" should "build new binarizer with parametres given on the Map and be the same with SparkMl Binarizer" in {
     val CaraDsFeature=Binarizer(
       Map("InputCol"->"Input",
         "InputCols"->"col1 , col2 ,col3, col4",
