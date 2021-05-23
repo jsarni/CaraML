@@ -7,6 +7,7 @@ import io.github.jsarni.TestBase
 import org.apache.spark.ml.{Pipeline, PipelineStage}
 import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
 import org.apache.spark.ml.evaluation.RegressionEvaluator
+import org.apache.spark.ml.evaluation.Evaluator
 
 import scala.util.Try
 
@@ -118,7 +119,9 @@ class CaraParserTest extends TestBase {
     val caraYaml = CaraYaml(caraPath)
     val caraParser = new CaraParser(caraYaml)
 
-    val res = caraParser.parsePipeline()
+
+    val parsePipeline = PrivateMethod[Try[Pipeline]]('parsePipeline)
+    val res = caraParser.invokePrivate(parsePipeline())
     val exprectedRes = new Pipeline().setStages(Array(new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)))
 
     res.isSuccess shouldBe true
@@ -171,9 +174,25 @@ class CaraParserTest extends TestBase {
     val caraYaml = CaraYaml(caraPath)
     val caraParser = new CaraParser(caraYaml)
 
-    val res = caraParser.parseEvaluator()
+    val parseEvaluator = PrivateMethod[Try[Evaluator]]('parseEvaluator)
+    val res = caraParser.invokePrivate(parseEvaluator())
 
     res.isSuccess shouldBe true
     res.get.isInstanceOf[RegressionEvaluator] shouldBe true
+  }
+
+  "build" should "build the described Pipeline of the Yaml File" in {
+    val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val res = caraParser.build()
+
+    val exprectedRes = new Pipeline().setStages(Array(new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)))
+
+    res.isSuccess shouldBe true
+    res.get.evaluator.isInstanceOf[RegressionEvaluator] shouldBe true
+    res.get.pipeline.getStages.map(_.extractParamMap().toSeq.map(_.value)).head should contain theSameElementsAs
+      exprectedRes.getStages.map(_.extractParamMap().toSeq.map(_.value)).head
   }
 }
