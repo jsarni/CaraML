@@ -6,7 +6,9 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.IllegalArgumentException
 
 class RegexTokenizerTest extends TestBase {
-  "RegexTokenizer build Success" should "build new RegexTokenizer from given parameters and return the same args as SparkML RegexTokenizer" in {
+  "RegexTokenizer build Success" should
+    "build new RegexTokenizer from given parameters and return the same args as SparkML RegexTokenizer" in {
+
     val CaraDsFeature=RegexTokenizer(
       Map ("Gaps"->"true",
         "InputCol"->"Input",
@@ -14,7 +16,9 @@ class RegexTokenizerTest extends TestBase {
         "Pattern" ->" * ",
         "OutputCol" -> "Col10"
         ,"ToLowercase" -> "false"
-      ))
+      )
+    )
+
     val SparkFeature=new fromSparkML()
       .setGaps(true)
       .setInputCol("Input")
@@ -22,12 +26,16 @@ class RegexTokenizerTest extends TestBase {
       .setPattern(" * ")
       .setToLowercase(false)
       .setOutputCol("Col10")
+
     val CaraDsParams= CaraDsFeature.build().get.extractParamMap.toSeq.map(_.value).toList
     val SparkParams = SparkFeature.extractParamMap().toSeq.map(_.value).toList
+
     CaraDsParams should contain theSameElementsAs  SparkParams
 
   }
+
   "RegexTokenizer build Failure" should "fail to build RegexTokenizer with wrong parameters" in {
+
     println("Gaps  parameter must be Boolean ")
     an [IllegalArgumentException] must be thrownBy RegexTokenizer(
       Map ("Gaps"->"12",

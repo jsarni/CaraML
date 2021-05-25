@@ -6,13 +6,16 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.IllegalArgumentException
 
 class HashingTFTest extends TestBase {
+
   "HashingTF build Success" should "build new HashingTF from given parameters and return the same args as SparkML HashingTF" in {
+
     val CaraDsFeature=HashingTF(
       Map ("Binary"->"true",
         "InputCol"->"Input",
         "OutputCol" -> "Col10"
         ,"NumFeatures"->"2"
-      ))
+      )
+    )
     val SparkFeature=new fromSparkML()
       .setBinary(true)
       .setInputCol("Input")
@@ -21,10 +24,12 @@ class HashingTFTest extends TestBase {
 
     val CaraDsParams= CaraDsFeature.build().get.extractParamMap.toSeq.map(_.value).toList
     val SparkParams = SparkFeature.extractParamMap().toSeq.map(_.value).toList
+
     CaraDsParams should contain theSameElementsAs  SparkParams
 
   }
   "HashingTF build Failure" should "fail to build HashingTF with wrong parameters" in {
+
     println("Binary  parameter must be Boolean ")
     an [IllegalArgumentException] must be thrownBy HashingTF(
       Map ("Binary"->"OK",
@@ -32,6 +37,7 @@ class HashingTFTest extends TestBase {
         "OutputCol" -> "Col10"
         ,"NumFeatures"->"2"
       )).build().get
+
     println("NumFeatures parameter must be > 0 ")
     an [IllegalArgumentException] must be thrownBy HashingTF(
       Map ("Binary"->"OK",
@@ -39,5 +45,6 @@ class HashingTFTest extends TestBase {
         "OutputCol" -> "Col10"
         ,"NumFeatures"->"0"
       )).build().get
+
   }
 }

@@ -5,7 +5,10 @@ import org.apache.spark.ml.feature.{Bucketizer => fromSparkML}
 import java.lang.reflect.InvocationTargetException
 import java.lang.IllegalArgumentException
 class BucketizerTest extends TestBase {
-  "Bucketizer build Success" should "build new Bucketizer with parametres given on the Map and be the same with SparkMl Bucketizer" in {
+
+  "Bucketizer build Success" should
+    "build new Bucketizer with parametres given on the Map and be the same with SparkMl Bucketizer" in {
+
     val CaraDsFeature=Bucketizer(
       Map ("HandleInvalid"->"skip",
         "InputCol"->"Input",
@@ -14,7 +17,9 @@ class BucketizerTest extends TestBase {
         "OutputCols" -> "Col10 , Col11,Col_12,Col_vector_1",
         "Splits" -> "-0.5,0.0,0.5",
         "SplitsArray" -> "1.0 , 4.0 , 8.0"
-      ))
+      )
+    )
+
     val SparkFeature=new fromSparkML()
       .setHandleInvalid("skip")
       .setInputCol("Input")
@@ -26,10 +31,12 @@ class BucketizerTest extends TestBase {
 
     val CaraDsParams= CaraDsFeature.build().get.extractParamMap.toSeq.map(_.value).toList
     val SparkParams = SparkFeature.extractParamMap().toSeq.map(_.value).toList
+
     CaraDsParams should contain theSameElementsAs  SparkParams
 
   }
   "Bucketizer build Failure" should "fail to build new Bucketizer when wrong parameter is set" in {
+
     println("HandlInvalid parameter must be one of : error, skip, keep")
     an [InvocationTargetException] must be thrownBy Bucketizer(
       Map ("HandleInvalid"->"OK",
@@ -51,6 +58,7 @@ class BucketizerTest extends TestBase {
         ,"Splits" -> "-0.5,0.0,0.5"
         ,"SplitsArray" -> "1.0 , 8.0"
       )).build().get
+
     println("Splits parameter must be est correctly")
     an [InvocationTargetException] must be thrownBy Bucketizer(
       Map ("HandleInvalid"->"error",
@@ -61,6 +69,7 @@ class BucketizerTest extends TestBase {
         ,"Splits" -> "-0.5,0.5"
         ,"SplitsArray" -> "1.0 ,3.0, 8.0"
       )).build().get
+
   }
 
 }
