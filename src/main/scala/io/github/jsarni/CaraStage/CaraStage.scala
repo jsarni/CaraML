@@ -12,6 +12,23 @@ trait CaraStage {
   def getMethode(stage : PipelineStage, field : Any, fieldName : String): Method = {
     val methodeName = "set" + fieldName
     field match {
+      case _ : Any  if field.getClass == Array[Array[Boolean]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Boolean]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Double]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Double]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[String]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[String]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Float]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Float]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Short]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Short]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Char]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Char]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Byte]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Byte]]].getClass )
+      case _ : Any  if field.getClass == Array[Array[Long]]().getClass  =>
+        stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Array[Long]]].getClass )
+      case _ : Any  if field.getClass == Array[Boolean]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Boolean]].getClass )
       case _ : Any  if field.getClass == Array[Double]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Double]].getClass )
       case _ : Any  if field.getClass == Array[String]().getClass  =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[String]].getClass )
       case _ : Any  if field.getClass == Array[Float]().getClass   =>   stage.getClass.getMethod(methodeName, field.asInstanceOf[Array[Float]].getClass )
