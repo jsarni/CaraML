@@ -237,5 +237,6 @@ class CaraParserTest extends TestBase {
     res.get.evaluator.isInstanceOf[RegressionEvaluator] shouldBe true
     res.get.pipeline.getStages.map(_.extractParamMap().toSeq.map(_.value)).head should contain theSameElementsAs
       exprectedRes.getStages.map(_.extractParamMap().toSeq.map(_.value)).head
+    res.get.tuner shouldBe TuningStageDescription("CrossValidator", "NumFolds", "3")
   }
 }
