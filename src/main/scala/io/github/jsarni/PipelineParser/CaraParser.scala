@@ -1,18 +1,27 @@
 package io.github.jsarni.PipelineParser
 
 import com.fasterxml.jackson.databind.JsonNode
+import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
 import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription, CaraStageMapper}
 import io.github.jsarni.CaraYaml.CaraYaml
+import org.apache.spark.ml.evaluation.Evaluator
 import org.apache.spark.ml.{Pipeline, PipelineStage}
 
 import scala.collection.JavaConverters._
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 
 class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
 
   val contentTry = caraYaml.loadFile()
 
-  def parse(): Try[Pipeline] = {
+  def build(): Try[CaraPipeline] = {
+    for {
+      pipeline <- parsePipeline()
+      evaluator <- parseEvaluator()
+    } yield CaraPipeline(pipeline, evaluator)
+  }
+
+  private[PipelineParser] def parsePipeline(): Try[Pipeline] = {
     for {
       content <- contentTry
       stagesDescriptions <- extractStages(content)
@@ -22,8 +31,27 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
     } yield pipeline
   }
 
+  private[PipelineParser] def parseEvaluator(): Try[Evaluator] = {
+    for {
+      content <- contentTry
+      evaluatorName <- extractEvaluator(content)
+      evaluator = mapEvaluator(evaluatorName)
+    } yield evaluator
+  }
+
+  private[PipelineParser] def parseTuner(): Try[TuningStageDescription] = {
+    for {
+      content <- contentTry
+      tunerDesc <- extractTuner(content)
+      validatedTunerDesc = mapTuner(tunerDesc)
+      } yield validatedTunerDesc
+  }
+
+
+
   private[PipelineParser] def extractStages(fileContent: JsonNode): Try[List[CaraStageDescription]] = Try {
-    val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList
+    val stagesList =
+      fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("stage"))
     val stages = stagesList.map{
       stageDesc =>
         val name = stageDesc.at("/stage").asText()
@@ -48,6 +76,44 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
         CaraStageDescription(name, paramsMap)
     }
     stages
+  }
+
+  private[PipelineParser] def extractEvaluator(fileContent: JsonNode): Try[String] = Try {
+
+    val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("evaluator"))
+
+    val evaluatorList = stagesList.map{ stageDesc =>stageDesc.at("/evaluator").asText()}
+
+    evaluatorList.length match {
+      case 1 => evaluatorList.head
+      case _ =>
+        throw new Exception("Error: You must define exactly one SparkML Evaluator")
+    }
+  }
+
+  private[PipelineParser] def extractTuner(fileContent: JsonNode): Try[TuningStageDescription] = {
+
+    val tunersList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("tuner"))
+
+    tunersList.length match {
+      case l if l <= 1 =>
+        val tunerJson = tunersList.head
+        val tunerName = tunerJson.at("/tuner").textValue()
+
+        val paramsJson = tunerJson.at("/params")
+          val paramList = paramsJson.iterator().asScala.toList
+          paramList.length match {
+            case 1 =>
+              val paramName = paramList.flatMap { r => r.fieldNames().asScala.toList }.head
+              val paramValue = paramList.head.at(s"/$paramName").asText()
+
+              Success(TuningStageDescription(tunerName, paramName, paramValue))
+            case _ =>
+              Failure(new IllegalArgumentException("Tuners must have exactly one param"))
+          }
+      case _ =>
+        Failure(new IllegalArgumentException("Error: You must define exactly one SparkML Evaluator"))
+    }
   }
 
   private[PipelineParser] def parseStage(stageDescription: CaraStageDescription): Try[Any] =
