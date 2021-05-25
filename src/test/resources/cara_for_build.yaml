@@ -5,3 +5,6 @@ CaraPipeline:
     - RegParam: 0.3
     - ElasticNetParam: 0.1
 - evaluator: RegressionEvaluator
+- tuner: CrossValidator
+  params:
+    - NumFolds: 3
