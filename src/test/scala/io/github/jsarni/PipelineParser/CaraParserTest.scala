@@ -2,6 +2,7 @@ package io.github.jsarni.PipelineParser
 
 import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription}
 import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
+import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
 import io.github.jsarni.CaraYaml.CaraYaml
 import io.github.jsarni.TestBase
 import org.apache.spark.ml.{Pipeline, PipelineStage}
@@ -13,7 +14,7 @@ import scala.util.Try
 
 class CaraParserTest extends TestBase {
 
-  "extractEvaluator" should "return parse the yaml description file to a json object" in {
+  "extractTuner" should "return parse the yaml description file to a json object" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
     val caraYaml = CaraYaml(caraPath)
     val caraParser = new CaraParser(caraYaml)
@@ -129,7 +130,7 @@ class CaraParserTest extends TestBase {
       exprectedRes.getStages.map(_.extractParamMap().toSeq.map(_.value)).head
   }
 
-  "extractEvaluator" should "get the correct Evaluator Name from the Yaml File" in {
+  "extractTuner" should "get the correct Evaluator Name from the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
     val caraYaml = CaraYaml(caraPath)
     val caraParser = new CaraParser(caraYaml)
@@ -179,6 +180,48 @@ class CaraParserTest extends TestBase {
 
     res.isSuccess shouldBe true
     res.get.isInstanceOf[RegressionEvaluator] shouldBe true
+  }
+
+  "extractTuner" should "get the correct Tuner Description from the Yaml File" in {
+    val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val myJson = caraYaml.loadFile()
+
+    val extractTuner = PrivateMethod[Try[TuningStageDescription]]('extractTuner)
+    val result = caraParser.invokePrivate(extractTuner(myJson.get))
+
+    result.isSuccess shouldBe true
+    result.get shouldBe TuningStageDescription("CrossValidator", "NumFolds", "3")
+  }
+
+  it should "raise an exception ilf there is more than one tuner in the Yaml File" in {
+    val caraPath = getClass.getResource("/cara_two_evaluator.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val myJson = caraYaml.loadFile()
+
+    val extractTuner = PrivateMethod[Try[TuningStageDescription]]('extractTuner)
+    val result = caraParser.invokePrivate(extractTuner(myJson.get))
+
+    result.isFailure shouldBe true
+    an [IllegalArgumentException] should be thrownBy result.get
+  }
+
+  "parseTuner" should "build the described Tuner of the Yaml File" in {
+    val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
+    val caraYaml = CaraYaml(caraPath)
+    val caraParser = new CaraParser(caraYaml)
+
+    val myJson = caraYaml.loadFile()
+
+    val extractTuner = PrivateMethod[Try[TuningStageDescription]]('extractTuner)
+    val result = caraParser.invokePrivate(extractTuner(myJson.get))
+
+    result.isSuccess shouldBe true
+    result.get shouldBe TuningStageDescription("CrossValidator", "NumFolds", "3")
   }
 
   "build" should "build the described Pipeline of the Yaml File" in {
