@@ -18,7 +18,8 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
     for {
       pipeline <- parsePipeline()
       evaluator <- parseEvaluator()
-    } yield CaraPipeline(pipeline, evaluator)
+      tunerDesc <- parseTuner()
+    } yield CaraPipeline(pipeline, evaluator, tunerDesc)
   }
 
   private[PipelineParser] def parsePipeline(): Try[Pipeline] = {
