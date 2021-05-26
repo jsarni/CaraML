@@ -25,7 +25,9 @@ final class CaraModel(yamlPath: String, datasetPath: String, format: String, sav
 
   def generateReport(model: PipelineModel) : Try[Unit] = ???
 
-  private def generateModel(caraPipeline: CaraPipeline): Try[Pipeline] = ???
+  private def generateModel(caraPipeline: CaraPipeline): Try[Pipeline] = Try{
+    ???
+  }
 
   private def train(pipeline: Pipeline, dataset: Dataset[_]): Try[PipelineModel] = Try {
     pipeline.fit(dataset)
