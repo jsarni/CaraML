@@ -3,7 +3,7 @@ package io.github.jsarni.PipelineParser
 import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription}
 import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
 import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
-import io.github.jsarni.CaraYaml.CaraYaml
+import io.github.jsarni.CaraYaml.CaraYamlReader
 import io.github.jsarni.TestBase
 import org.apache.spark.ml.{Pipeline, PipelineStage}
 import org.apache.spark.ml.classification.{LogisticRegression => SparkLR}
@@ -16,7 +16,7 @@ class CaraParserTest extends TestBase {
 
   "extractTuner" should "return parse the yaml description file to a json object" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -36,7 +36,7 @@ class CaraParserTest extends TestBase {
 
   "parseSingleStageMap" should "parse a CaraStageDescription to a CaraStage " in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraParser = CaraParser(CaraYaml(caraPath))
+    val caraParser = CaraParser(CaraYamlReader(caraPath))
 
     val params = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
     val stageDesc =
@@ -55,7 +55,7 @@ class CaraParserTest extends TestBase {
 
   "parseStages" should "parse a list of CaraStageDescription to the corresponding list of CaraStage" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraParser = CaraParser(CaraYaml(caraPath))
+    val caraParser = CaraParser(CaraYamlReader(caraPath))
 
     val params1 = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
     val params2 = Map("MaxIter" -> "20", "FitIntercept" -> "False", "ProbabilityCol" -> "col1")
@@ -75,7 +75,7 @@ class CaraParserTest extends TestBase {
 
   "buildStages" should "build a list PipelineStages out of a list of CaraStages" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraParser = CaraParser(CaraYaml(caraPath))
+    val caraParser = CaraParser(CaraYamlReader(caraPath))
 
     val params1 = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
     val params2 = Map("MaxIter" -> "20", "FitIntercept" -> "False", "ProbabilityCol" -> "col1")
@@ -102,7 +102,7 @@ class CaraParserTest extends TestBase {
 
   "buildPipeline" should "build a Spark ML Pipeline out of a list of PipelineStages" in {
     val caraPath = getClass.getResource("/cara.yaml").getPath
-    val caraParser = CaraParser(CaraYaml(caraPath))
+    val caraParser = CaraParser(CaraYamlReader(caraPath))
 
     val stagesList = List(
       new SparkLR().setMaxIter(10).setRegParam(0.3).setElasticNetParam(0.1)
@@ -117,7 +117,7 @@ class CaraParserTest extends TestBase {
 
   "parsePipeline" should "build the described Pipeline of the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
 
@@ -132,7 +132,7 @@ class CaraParserTest extends TestBase {
 
   "extractTuner" should "get the correct Evaluator Name from the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -146,7 +146,7 @@ class CaraParserTest extends TestBase {
 
   it should "Raise an exception if there is no evaluator specified" in {
     val caraPath = getClass.getResource("/cara_zero_evaluator.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -159,7 +159,7 @@ class CaraParserTest extends TestBase {
 
   it should "Raise an exception if there is more than one evaluator specified" in {
     val caraPath = getClass.getResource("/cara_two_evaluator.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -172,7 +172,7 @@ class CaraParserTest extends TestBase {
 
   "parseEvaluator" should "build the described evaluator of the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val parseEvaluator = PrivateMethod[Try[Evaluator]]('parseEvaluator)
@@ -184,7 +184,7 @@ class CaraParserTest extends TestBase {
 
   "extractTuner" should "get the correct Tuner Description from the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -198,7 +198,7 @@ class CaraParserTest extends TestBase {
 
   it should "raise an exception ilf there is more than one tuner in the Yaml File" in {
     val caraPath = getClass.getResource("/cara_two_evaluator.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -212,7 +212,7 @@ class CaraParserTest extends TestBase {
 
   "parseTuner" should "build the described Tuner of the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val myJson = caraYaml.loadFile()
@@ -226,7 +226,7 @@ class CaraParserTest extends TestBase {
 
   "build" should "build the described Pipeline of the Yaml File" in {
     val caraPath = getClass.getResource("/cara_for_build.yaml").getPath
-    val caraYaml = CaraYaml(caraPath)
+    val caraYaml = CaraYamlReader(caraPath)
     val caraParser = CaraParser(caraYaml)
 
     val res = caraParser.build()

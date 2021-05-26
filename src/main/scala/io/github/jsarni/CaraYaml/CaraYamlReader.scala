@@ -7,7 +7,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.{File, FileInputStream}
 import scala.util.Try
 
-final case class CaraYaml(yamlPath: String){
+final case class CaraYamlReader(yamlPath: String){
 
   def loadFile(): Try[JsonNode] =
     for {

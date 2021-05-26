@@ -5,11 +5,11 @@ import java.io.FileNotFoundException
 import io.github.jsarni.TestBase
 import org.yaml.snakeyaml.scanner.ScannerException
 
-class CaraYamlTest extends TestBase {
+class CaraYamlReaderTest extends TestBase {
 
     "loadFile" should "return parse the yaml description file to a json object" in {
       val caraPath = getClass.getResource("/cara.yaml").getPath
-      val caraYaml = CaraYaml(caraPath)
+      val caraYaml = CaraYamlReader(caraPath)
 
       val result = caraYaml.loadFile()
 
@@ -18,7 +18,7 @@ class CaraYamlTest extends TestBase {
 
     it should "Return an exception if the file does not exist" in {
       val caraPath = "/inexisting_model.yaml"
-      val caraYaml = CaraYaml(caraPath)
+      val caraYaml = CaraYamlReader(caraPath)
 
       val result = caraYaml.loadFile()
 
@@ -27,7 +27,7 @@ class CaraYamlTest extends TestBase {
 
     it should "Return an exception if the file format is not correct" in {
       val caraPath = getClass.getResource("/incorrect_cara.yaml").getPath
-      val caraYaml = CaraYaml(caraPath)
+      val caraYaml = CaraYamlReader(caraPath)
 
       val result = caraYaml.loadFile()
 
