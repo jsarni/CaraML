@@ -4,7 +4,5 @@ CaraPipeline:
     - MaxIter: 10
     - RegParam: 0.3
     - ElasticNetParam: 0.1
-- evaluator: RegressionEvaluator
-- tuner: CrossValidator
-  params:
-    - NumFolds: 3
+- tuner: Tuner 1
+- tuner: Tuner 2
