@@ -34,25 +34,25 @@ final class CaraModel(yamlPath: String, datasetPath: String, format: String, sav
     val methodeName = "set" + caraPipeline.tuner.paramName
     val model = tuningStage match  {
       case "CrossValidator" => {
-        val paramValue = caraPipeline.tuner.paramValue
+        val paramValue = caraPipeline.tuner.paramValue.toInt
         val crossValidatorModel = new CrossValidator()
           .setEstimator(pipeline)
           .setEvaluator(evaluator)
           .setParallelism(2)
 
-        crossValidatorModel.getClass.getMethod(methodeName, Int.getClass )
+        crossValidatorModel.getClass.getMethod(methodeName, paramValue.getClass )
           .invoke(crossValidatorModel,paramValue.asInstanceOf[java.lang.Integer])
         
         new Pipeline().setStages(Array(crossValidatorModel))
       }
       case "TrainValidationSplit" => {
-        val paramValue = caraPipeline.tuner.paramValue
+        val paramValue = caraPipeline.tuner.paramValue.toDouble
         val validationSplitModel = new TrainValidationSplit()
           .setEstimator(pipeline)
           .setEvaluator(evaluator)
           .setParallelism(2)
 
-        validationSplitModel.getClass.getMethod(methodeName, Double.getClass )
+        validationSplitModel.getClass.getMethod(methodeName, paramValue.getClass )
           .invoke(validationSplitModel,paramValue.asInstanceOf[java.lang.Double])
 
         new Pipeline().setStages(Array(validationSplitModel))
