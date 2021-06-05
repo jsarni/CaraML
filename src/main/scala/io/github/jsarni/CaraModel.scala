@@ -1,9 +1,12 @@
 package io.github.jsarni
 
+import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
 import io.github.jsarni.CaraYaml.CaraYamlReader
 import io.github.jsarni.DatasetLoader.CaraLoader
 import io.github.jsarni.PipelineParser.{CaraParser, CaraPipeline}
-import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.classification.LogisticRegressionModel
+import org.apache.spark.ml.regression.LinearRegressionModel
+import org.apache.spark.ml.{Pipeline, PipelineModel, classification}
 import org.apache.spark.sql.{Dataset, SparkSession}
 
 import scala.util.Try
@@ -23,7 +26,16 @@ final class CaraModel(yamlPath: String, datasetPath: String, format: String, sav
     _ <- save(fittedModel)
   } yield ()
 
-  def generateReport(model: PipelineModel) : Try[Unit] = ???
+  private def generateReport(model: PipelineModel) : Try[Unit] =Try {
+    val stagesModel=model.stages.last
+    val summaries  =stagesModel match {
+      case m: LogisticRegressionModel => m.summary
+      case m: LinearRegressionModel   => m.summary
+      case _ => _
+    }
+    summaries
+
+  }
 
   private def generateModel(caraPipeline: CaraPipeline): Try[Pipeline] = ???
 
