@@ -39,7 +39,6 @@ class RandomForestClassifierTest extends TestBase {
         .setFeaturesCol("FeatureCol")
         .setImpurity("entropy")
         .setLabelCol("LabelCol")
-        .setFeaturesCol("FeatureColname")
         .setLeafCol("LeafCol")
         .setMaxBins(10)
         .setMaxDepth(5)
@@ -60,19 +59,20 @@ class RandomForestClassifierTest extends TestBase {
     rdForest.build().isSuccess shouldBe true
 
     val res = List(rdForest.build().get)
-    println(res.map(_.extractParamMap()).map(_.toSeq.map(_.value)))
     val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
+      .map(_.map(elem =>
+        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
+        else List(elem)))
+      .flatten
+      .flatten
     val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
-//    val resParameters = res.map(_.extractParamMap().toSeq.map(_.value).toList)
-//    val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value).toList)
+      .map(_.map(elem =>
+        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
+        else List(elem)))
+      .flatten
+      .flatten
 
-
-//    println(res(0).asInstanceOf[SparkML].getThresholds)
-//    println(expectedResult(0).asInstanceOf[SparkML].get)
-
-//    resParameters.head should contain theSameElementsAs expectedParameters.head
-    println(expectedParameters)
-    println(resParameters)
+    resParameters should contain theSameElementsAs expectedParameters
 
     //    Test default values of unset params
     rdForestWithTwoParams.getImpurity shouldBe "gini"

@@ -35,7 +35,6 @@ class DecisionTreeClassifierTest extends TestBase {
           .setFeaturesCol("FeatureCol")
           .setImpurity("entropy")
           .setLabelCol("LabelCol")
-          .setFeaturesCol("FeatureColname")
           .setLeafCol("LeafCol")
           .setMaxBins(10)
           .setMaxDepth(5)
@@ -54,9 +53,19 @@ class DecisionTreeClassifierTest extends TestBase {
 
       val res = List(dTree.build().get)
       val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
+        .map(_.map(elem =>
+        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
+        else List(elem)))
+        .flatten
+        .flatten
       val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
+        .map(_.map(elem =>
+        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
+        else List(elem)))
+        .flatten
+        .flatten
 
-      resParameters.head should contain theSameElementsAs expectedParameters.head
+      resParameters should contain theSameElementsAs expectedParameters
 
       //    Test default values of unset params
       dTreeWithTwoParams.getImpurity shouldBe "gini"
