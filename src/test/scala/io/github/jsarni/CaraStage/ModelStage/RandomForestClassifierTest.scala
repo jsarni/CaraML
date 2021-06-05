@@ -3,6 +3,8 @@ package io.github.jsarni.CaraStage.ModelStage
 import io.github.jsarni.TestBase
 import org.apache.spark.ml.classification.{RandomForestClassifier => SparkML}
 
+import scala.util.Try
+
 class RandomForestClassifierTest extends TestBase {
   "build" should "Create an lr model and set all parameters with there args values or set default ones" in {
     val params = Map(
@@ -55,13 +57,22 @@ class RandomForestClassifierTest extends TestBase {
         .setNumTrees(12)
 
     )
-          rdForest.build().isSuccess shouldBe true
+    rdForest.build().isSuccess shouldBe true
 
     val res = List(rdForest.build().get)
+    println(res.map(_.extractParamMap()).map(_.toSeq.map(_.value)))
     val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
     val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
+//    val resParameters = res.map(_.extractParamMap().toSeq.map(_.value).toList)
+//    val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value).toList)
 
-    resParameters.head should contain theSameElementsAs expectedParameters.head
+
+//    println(res(0).asInstanceOf[SparkML].getThresholds)
+//    println(expectedResult(0).asInstanceOf[SparkML].get)
+
+//    resParameters.head should contain theSameElementsAs expectedParameters.head
+    println(expectedParameters)
+    println(resParameters)
 
     //    Test default values of unset params
     rdForestWithTwoParams.getImpurity shouldBe "gini"
