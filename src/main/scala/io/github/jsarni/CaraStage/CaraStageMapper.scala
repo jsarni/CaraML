@@ -17,6 +17,8 @@ trait CaraStageMapper {
     stageDescription.stageName match {
       case "LogisticRegression" =>
         LogisticRegression(stageDescription.params)
+      case "LinearRegression" =>
+        LinearRegression(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
     }
@@ -55,7 +57,7 @@ trait CaraStageMapper {
           throw new IllegalArgumentException("The only parameter available for TrainValidationSplit is TrainRatio")
         Try(tuningStageDesc.paramValue.toDouble) match {
           case Success(value) =>
-            if (value > 1 || value < 0)
+            if (value < 1 || value > 0)
               tuningStageDesc
             else
               throw new IllegalArgumentException("The TrainRation parameter value must be a Double between 0 and 1")
