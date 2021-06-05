@@ -1,30 +1,27 @@
 package io.github.jsarni
 
 import io.github.jsarni.CaraYaml.CaraYamlReader
-import io.github.jsarni.DatasetLoader.CaraLoader
 import io.github.jsarni.PipelineParser.{CaraParser, CaraPipeline}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.apache.spark.ml.tuning.{CrossValidator, TrainValidationSplit}
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 
 import scala.util.Try
 
-final class CaraModel(yamlPath: String, datasetPath: String, format: String, savePath: String)(implicit spark: SparkSession) {
+final class CaraModel(yamlPath: String, dataset: Dataset[_], format: String, savePath: String)(implicit spark: SparkSession) {
 
   val yaml = CaraYamlReader(yamlPath)
   val parser = CaraParser(yaml)
-  val loader = CaraLoader(datasetPath, format)
 
   def run(): Try[Unit] = for {
     caraPipeline <- parser.build()
     sparkPipeline <- generateModel(caraPipeline)
-    dataset <- loader.load()
     fittedModel <- train(sparkPipeline, dataset)
-    _ <- generateReport(fittedModel)
+//    _ <- generateReport(fittedModel)
     _ <- save(fittedModel)
   } yield ()
 
-  def generateReport(model: PipelineModel) : Try[Unit] = ???
+//  def generateReport(model: PipelineModel) : Try[Unit] = ???
 
   
   private def generateModel(caraPipeline: CaraPipeline) : Try[Pipeline] = Try {
@@ -38,6 +35,7 @@ final class CaraModel(yamlPath: String, datasetPath: String, format: String, sav
         val crossValidatorModel = new CrossValidator()
           .setEstimator(pipeline)
           .setEvaluator(evaluator)
+          .setEstimatorParamMaps(new ParamGridBuilder().build())
           .setParallelism(2)
 
         crossValidatorModel.getClass.getMethod(methodeName, paramValue.getClass )
@@ -50,6 +48,7 @@ final class CaraModel(yamlPath: String, datasetPath: String, format: String, sav
         val validationSplitModel = new TrainValidationSplit()
           .setEstimator(pipeline)
           .setEvaluator(evaluator)
+          .setEstimatorParamMaps(new ParamGridBuilder().build())
           .setParallelism(2)
 
         validationSplitModel.getClass.getMethod(methodeName, paramValue.getClass )
