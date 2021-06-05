@@ -17,6 +17,8 @@ trait CaraStageMapper {
     stageDescription.stageName match {
       case "LogisticRegression" =>
         LogisticRegression(stageDescription.params)
+      case "LinearRegression" =>
+        LinearRegression(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
     }
