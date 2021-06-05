@@ -8,7 +8,7 @@ import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValida
 
 import scala.util.Try
 
-final class CaraModel(yamlPath: String, dataset: Dataset[_], format: String, savePath: String)(implicit spark: SparkSession) {
+final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(implicit spark: SparkSession) {
 
   val yaml = CaraYamlReader(yamlPath)
   val parser = CaraParser(yaml)
@@ -23,6 +23,9 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], format: String, sav
 
 //  def generateReport(model: PipelineModel) : Try[Unit] = ???
 
+  def evaluate(model: PipelineModel, dataset: Dataset[_]): Dataset[_] = {
+    model.transform(dataset)
+  }
   
   private def generateModel(caraPipeline: CaraPipeline) : Try[Pipeline] = Try {
     val pipeline = caraPipeline.pipeline
@@ -67,6 +70,5 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], format: String, sav
   private def save(model: PipelineModel) : Try[Unit] = Try {
     model.write.save(savePath)
   }
-
 
 }
