@@ -16,6 +16,10 @@ trait CaraStageMapper {
   def mapModelStage(stageDescription: CaraStageDescription): CaraModel = {
     stageDescription.stageName match {
       case "LogisticRegression" => LogisticRegression(stageDescription.params)
+      case "RandomForestClassifier" => RandomForestClassifier(stageDescription.params)
+      case "LinearRegression" => LinearRegression(stageDescription.params)
+      case "GBTClassifier" => GBTClassifier(stageDescription.params)
+      case "DecisionTreeClassifier" => DecisionTreeClassifier(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
     }
