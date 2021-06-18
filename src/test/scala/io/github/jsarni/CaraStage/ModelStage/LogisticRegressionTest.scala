@@ -19,7 +19,8 @@ class LogisticRegressionTest extends TestBase {
       "RawPredictionCol"-> "RawPredictColname",
       "Standardization" -> "True",
       "Tol" -> "0.13",
-      "WeightCol" -> "WeightColname"
+      "WeightCol" -> "WeightColname",
+      "Thresholds"  -> "0.2, 0.4, .05"
     )
     val lr = LogisticRegression(params)
     val lrWithTwoParams = new SparkLR()
@@ -39,6 +40,7 @@ class LogisticRegressionTest extends TestBase {
         .setRawPredictionCol("RawPredictColname")
         .setStandardization(true).setTol(0.13)
         .setWeightCol("WeightColname")
+        .setThresholds(Array(0.2, 0.4, .05))
     )
     lr.build().isSuccess shouldBe true
 
@@ -67,7 +69,8 @@ class LogisticRegressionTest extends TestBase {
       "RawPredictionCol"-> "RawPredictColname",
       "Standardization" -> "True",
       "Tol" -> "0.13",
-      "WeightCol" -> "WeightColname"
+      "WeightCol" -> "WeightColname",
+      "Thresholds"  -> "0.2, 0.4, .05"
     )
     val caraLr = LogisticRegression(params)
     val model =caraLr.build().get.asInstanceOf[SparkLR]
