@@ -27,7 +27,7 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
     val model = PipelineModel.load(savePath)
     model.transform(dataset)
   }
-  
+
   private def generateModel(caraPipeline: CaraPipeline) : Try[Pipeline] = Try {
     val pipeline = caraPipeline.pipeline
     val evaluator = caraPipeline.evaluator
@@ -44,7 +44,7 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
 
         crossValidatorModel.getClass.getMethod(methodeName, paramValue.getClass )
           .invoke(crossValidatorModel,paramValue.asInstanceOf[java.lang.Integer])
-        
+
         new Pipeline().setStages(Array(crossValidatorModel))
       }
       case "TrainValidationSplit" => {
