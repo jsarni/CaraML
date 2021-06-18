@@ -3,14 +3,14 @@ package io.github.jsarni.PipelineParser
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
 import io.github.jsarni.CaraStage.{CaraStage, CaraStageDescription, CaraStageMapper}
-import io.github.jsarni.CaraYaml.CaraYaml
+import io.github.jsarni.CaraYaml.CaraYamlReader
 import org.apache.spark.ml.evaluation.Evaluator
 import org.apache.spark.ml.{Pipeline, PipelineStage}
 
 import scala.collection.JavaConverters._
 import scala.util.{Try, Success, Failure}
 
-class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
+class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMapper{
 
   val contentTry = caraYaml.loadFile()
 
@@ -145,5 +145,5 @@ class CaraParser(caraYaml: CaraYaml) extends ParserUtils with CaraStageMapper{
 }
 
 object CaraParser {
-  def apply(caraYaml: CaraYaml): CaraParser = new CaraParser(caraYaml)
+  def apply(caraYaml: CaraYamlReader): CaraParser = new CaraParser(caraYaml)
 }
