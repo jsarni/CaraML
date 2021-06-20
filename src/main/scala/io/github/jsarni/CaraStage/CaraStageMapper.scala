@@ -25,6 +25,12 @@ trait CaraStageMapper {
         GBTClassifier(stageDescription.params)
       case "DecisionTreeClassifier" =>
         DecisionTreeClassifier(stageDescription.params)
+      case "KMeans" =>
+        KMeans(stageDescription.params)
+      case "LDA" =>
+        LDA(stageDescription.params)
+      case "NaiveBayes" =>
+        NaiveBayes(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
     }
