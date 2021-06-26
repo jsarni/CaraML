@@ -15,6 +15,8 @@ import java.io._
 import java.sql.Timestamp
 import java.time.Instant
 
+import scala.collection.mutable
+
 final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(implicit spark: SparkSession) {
 
   val yaml = CaraYamlReader(yamlPath)
@@ -29,7 +31,7 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
   } yield ()
 
 
-  def writeFile(filename: String, lines: Map[String,Any]): Unit = {
+  def writeFile(filename: String, lines: mutable.SortedMap[String,Any]): Unit = {
     val file = new File(filename)
     val bw = new BufferedWriter(new FileWriter(file))
     for ((field,value) <- lines) {
@@ -62,7 +64,8 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
       case m: LogisticRegressionModel => {
 
         val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics= Map("Model Name"                    ->modelName,
+        val modelMetrics= mutable.SortedMap(
+                              "Model Name"                    ->modelName,
                               "Report Date Generation"        -> rapportDate,
                               "Accuracy"                      -> m.summary.accuracy,
                               "features Col"                  -> m.summary.featuresCol,
