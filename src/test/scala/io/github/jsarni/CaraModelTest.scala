@@ -31,7 +31,7 @@ class CaraModelTest extends TestBase {
         .master("local[1]")
         .getOrCreate()
 
-    val caraModel = new CaraModel("YamlPath", spark.emptyDataFrame, "savePath")(spark)
+    val caraModel = new CaraModel("YamlPath", spark.emptyDataFrame,  "savePath")(spark)
     val pipeline = new Pipeline()
       .setStages(Array(lr))
     val crossCaraPipeline = CaraPipeline(pipeline, crossEvaluator, crossTuner)

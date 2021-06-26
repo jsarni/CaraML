@@ -94,7 +94,8 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
     }
   }
 
-  def evaluate(model: PipelineModel, dataset: Dataset[_]): Dataset[_] = {
+  def evaluate(dataset: Dataset[_]): Dataset[_] = {
+    val model = PipelineModel.load(savePath)
     model.transform(dataset)
   }
 
