@@ -47,6 +47,7 @@ trait CaraStageMapper {
   def mapEvaluator(evaluatorName: String): Evaluator = {
     evaluatorName match {
       case "RegressionEvaluator" => new RegressionEvaluator()
+      case "MulticlassClassificationEvaluator" => new MulticlassClassificationEvaluator()
       case _ =>
         throw
           new Exception(s"${evaluatorName} is not a valid SparkML Validator name. Please verify your Yaml File")
