@@ -2,7 +2,7 @@
 
 ## Presentation
 
-  CaraMl is a Scala Spark framework for distributed Machine Learning programs, using the Spark MLlib in the simplest possible way. No need to write hundreds or thousands lines code, just discribing pipline of models and/or transformations. the purpose is to do "Machine Learning as Code" 
+CaraMl is a Scala Spark framework for distributed Machine Learning programs, using the Spark MLlib in the simplest possible way. No need to write hundreds or thousands lines code, just discribing pipline of models and/or transformations. the purpose is to do "Machine Learning as Code" 
 
 
 
@@ -24,6 +24,9 @@ To use CaraML framework, you must satisfy the following requirements:
 
 
 ## Usage
+
+To use CaraML, you can add the framework dependency in your Spark application
+- Sbt
 
 
 
