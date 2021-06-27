@@ -8,7 +8,7 @@ import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValida
 
 import scala.util.Try
 
-final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, overwrite: Boolean = true)(implicit spark: SparkSession) {
+final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, overwrite: Boolean = true) {
 
   val yaml = CaraYamlReader(yamlPath)
   val parser = CaraParser(yaml)
