@@ -157,6 +157,20 @@ This section lists all available SparkML components that you can use with CaraML
 - Tokenizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#tokenizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Tokenizer.html)
 - Word2Vec [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#word2vec) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Word2Vec.html)
 
+
+
+### *Tuner*
+
+- CrossValidator [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-tuning.html#cross-validation) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/tuning/CrossValidator.html)
+- TrainValidationSplit [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-tuning.html#train-validation-split) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/tuning/TrainValidationSplit.html)
+
+
+### *Evaluator*
+
+- RegressionEvaluator [Documontation](https://spark.apache.org/docs/latest/mllib-evaluation-metrics.html)
+- MulticlassClassificationEvaluator [Documontation](https://spark.apache.org/docs/latest/mllib-evaluation-metrics.html)
+
+
 ## *Example*
 
 For practical example you can refer to this [Link](), which is a github project that contain a project using the CaraML framework.
