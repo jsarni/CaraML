@@ -122,6 +122,7 @@ CaraPipeline:
 This section lists all available SparkML components that you can use with CaraML framework
 
 ### *Models*
+
 * **Classification**
   
   - LogisticRegression [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#logistic-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/LogisticRegression.html) 
@@ -133,12 +134,28 @@ This section lists all available SparkML components that you can use with CaraML
 * **Regression**
 
   - LinearRegression [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#linear-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/LinearRegression.html)
+  - DecisionTreeRegressor [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#decision-tree-regressionhttps://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/DecisionTreeRegressor.html) and [Documontation]()
+  - RandomForestRegressor [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#random-forest-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/RandomForestRegressor.html)
+  - GBTRegressor (Gradient-boosted tree Regressor) [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#gradient-boosted-tree-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/GBTRegressor.html)
+
 
 * **Clustering**
 
   - K-means [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#k-means) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/KMeans.html) 
   - LDA (Latent Dirichlet allocation) [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#latent-dirichlet-allocation-lda) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/LDA.html)
 
+### *Dataset operation*
+
+- Binarizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#binarizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Binarizer.html)
+- BucketedRandomProjectionLSH [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#bucketed-random-projection-for-euclidean-distance) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/BucketedRandomProjectionLSH.html)
+- Bucketizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#bucketizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Bucketizer.html)
+- ChiSqSelector [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#chisqselector) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/ChiSqSelector.html)
+- CountVectorizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#countvectorizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/CountVectorizer.html)
+- HashingTF [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#tf-idf) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/HashingTF.html)
+- IDF [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#tf-idf) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/IDF.html)
+- RegexTokenizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#tokenizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/RegexTokenizer.html)
+- Tokenizer [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#tokenizer) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Tokenizer.html)
+- Word2Vec [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-features.html#word2vec) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/feature/Word2Vec.html)
 
 ## *Example*
 
