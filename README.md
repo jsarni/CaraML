@@ -124,20 +124,20 @@ This section lists all available SparkML components that you can use with CaraML
 ### *Models*
 * **Classification**
   
-  - LogisticRegression Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#logistic-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/LogisticRegression.html) 
-  - DecisionTreeClassifier Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#decision-tree-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/DecisionTreeClassifier.html)
-  - GBTClassifier (Gradient-boosted tree classifier) Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#gradient-boosted-tree-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/GBTClassifier.html)
-  - NaiveBayes Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#naive-bayes) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/NaiveBayes.html)
-  - RandomForestClassifier Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#random-forest-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/RandomForestClassifier.html)
+  - LogisticRegression [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#logistic-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/LogisticRegression.html) 
+  - DecisionTreeClassifier [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#decision-tree-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/DecisionTreeClassifier.html)
+  - GBTClassifier (Gradient-boosted tree classifier) [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#gradient-boosted-tree-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/GBTClassifier.html)
+  - NaiveBayes [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#naive-bayes) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/NaiveBayes.html)
+  - RandomForestClassifier [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#random-forest-classifier) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/classification/RandomForestClassifier.html)
 
 * **Regression**
 
-  - LinearRegression Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#linear-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/LinearRegression.html)
+  - LinearRegression [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-classification-regression.html#linear-regression) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/regression/LinearRegression.html)
 
 * **Clustering**
 
-  - K-means Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#k-means) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/KMeans.html) 
-  - LDA (Latent Dirichlet allocation) Spark [MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#latent-dirichlet-allocation-lda) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/LDA.html)
+  - K-means [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#k-means) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/KMeans.html) 
+  - LDA (Latent Dirichlet allocation) [Spark MLlib example](https://spark.apache.org/docs/3.1.2/ml-clustering.html#latent-dirichlet-allocation-lda) and [Documontation](https://spark.apache.org/docs/3.1.2/api/scala/org/apache/spark/ml/clustering/LDA.html)
 
 
 ## *Example*
