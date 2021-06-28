@@ -18,8 +18,9 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
     for {
       pipeline <- parsePipeline()
       evaluator <- parseEvaluator()
-      tunerDesc <- parseTuner()
-    } yield CaraPipeline(pipeline, evaluator, tunerDesc)
+      hasTuner <- hasTuner()
+      tunerDescOpt = if (!hasTuner) None else Some(parseTuner().get)
+    } yield CaraPipeline(pipeline, evaluator, tunerDescOpt)
   }
 
   private[PipelineParser] def parsePipeline(): Try[Pipeline] = {
@@ -92,12 +93,18 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
     }
   }
 
+  private[PipelineParser] def hasTuner(): Try[Boolean] =
+    for {
+      content <- contentTry
+      hasTuner = content.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("tuner")).nonEmpty
+    } yield hasTuner
+
   private[PipelineParser] def extractTuner(fileContent: JsonNode): Try[TuningStageDescription] = {
 
     val tunersList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("tuner"))
 
     tunersList.length match {
-      case l if l <= 1 =>
+      case l if l == 1 =>
         val tunerJson = tunersList.head
         val tunerName = tunerJson.at("/tuner").textValue()
 

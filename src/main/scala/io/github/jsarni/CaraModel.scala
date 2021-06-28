@@ -8,7 +8,7 @@ import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValida
 
 import scala.util.Try
 
-final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(implicit spark: SparkSession) {
+final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, overwrite: Boolean = true) {
 
   val yaml = CaraYamlReader(yamlPath)
   val parser = CaraParser(yaml)
@@ -31,35 +31,46 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
   private def generateModel(caraPipeline: CaraPipeline) : Try[Pipeline] = Try {
     val pipeline = caraPipeline.pipeline
     val evaluator = caraPipeline.evaluator
-    val tuningStage = caraPipeline.tuner.tuningStage
-    val methodeName = "set" + caraPipeline.tuner.paramName
-    val model = tuningStage match  {
-      case "CrossValidator" => {
-        val paramValue = caraPipeline.tuner.paramValue.toInt
-        val crossValidatorModel = new CrossValidator()
-          .setEstimator(pipeline)
-          .setEvaluator(evaluator)
-          .setEstimatorParamMaps(new ParamGridBuilder().build())
-          .setParallelism(2)
+    val model = caraPipeline.tuner match {
+      case Some(tuner) =>
+        val methodeName = "set" + tuner.paramName
+        tuner.tuningStage match  {
+          case "CrossValidator" => {
+            val paramValue = tuner.paramValue.toInt
+            val crossValidatorModel = new CrossValidator()
 
-        crossValidatorModel.getClass.getMethod(methodeName, paramValue.getClass )
-          .invoke(crossValidatorModel,paramValue.asInstanceOf[java.lang.Integer])
+              .setEstimator(pipeline)
 
-        new Pipeline().setStages(Array(crossValidatorModel))
-      }
-      case "TrainValidationSplit" => {
-        val paramValue = caraPipeline.tuner.paramValue.toDouble
-        val validationSplitModel = new TrainValidationSplit()
-          .setEstimator(pipeline)
-          .setEvaluator(evaluator)
-          .setEstimatorParamMaps(new ParamGridBuilder().build())
-          .setParallelism(2)
+              .setEvaluator(evaluator)
 
-        validationSplitModel.getClass.getMethod(methodeName, paramValue.getClass )
-          .invoke(validationSplitModel,paramValue.asInstanceOf[java.lang.Double])
+              .setEstimatorParamMaps(new ParamGridBuilder().build())
 
-        new Pipeline().setStages(Array(validationSplitModel))
-      }
+              .setParallelism(2)
+            crossValidatorModel.getClass.getMethod(methodeName, paramValue.getClass )
+
+              .invoke(crossValidatorModel,paramValue.asInstanceOf[java.lang.Integer])
+            new Pipeline().setStages(Array(crossValidatorModel))
+          }
+          case "TrainValidationSplit" => {
+            val paramValue = tuner.paramValue.toDouble
+            val validationSplitModel = new TrainValidationSplit()
+
+              .setEstimator(pipeline)
+
+              .setEvaluator(evaluator)
+
+              .setEstimatorParamMaps(new ParamGridBuilder().build())
+
+              .setParallelism(2)
+            validationSplitModel.getClass.getMethod(methodeName, paramValue.getClass )
+
+              .invoke(validationSplitModel,paramValue.asInstanceOf[java.lang.Double])
+            new Pipeline().setStages(Array(validationSplitModel))
+          }
+
+        }
+      case None =>
+        pipeline
     }
     model
   }
@@ -69,7 +80,10 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
   }
 
   private def save(model: PipelineModel) : Try[Unit] = Try {
-    model.write.save(savePath)
+    if (overwrite)
+      model.write.overwrite().save(savePath)
+    else
+      model.write.save(savePath)
   }
 
 }
