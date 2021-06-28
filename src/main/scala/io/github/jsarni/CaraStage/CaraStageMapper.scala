@@ -33,6 +33,8 @@ trait CaraStageMapper {
         NaiveBayes(stageDescription.params)
       case "DecisionTreeRegressor" =>
         DecisionTreeRegressor(stageDescription.params)
+      case "RandomForestRegressor" =>
+        RandomForestRegressor(stageDescription.params)
       case _ => throw
         new Exception(s"${stageDescription.stageName} is not a valid Cara Stage name. Please verify your Yaml File")
     }
