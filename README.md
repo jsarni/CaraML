@@ -17,8 +17,8 @@ To use CaraML framework, you must satisfy the following requirements:
 
 ## *Installation* 
 
-  - Spark :  [Download hear](https://spark.apache.org/downloads.html) 
-  - Scala : [Download hear](https://www.scala-lang.org/download/)
+  - Spark :  [Download here](https://spark.apache.org/downloads.html) 
+  - Scala : [Download here](https://www.scala-lang.org/download/)
   - CaraML library : [CaraML]()
 
 
