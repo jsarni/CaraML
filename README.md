@@ -117,7 +117,7 @@ CaraPipeline:
 
 
 
-## *Available SparkML models, technics and features in CaraML*
+## *SparkML available components in CaraML*
 
 This section lists all available SparkML components that you can use with CaraML framework
 
