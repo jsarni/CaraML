@@ -2,6 +2,17 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{Word2Vec => fromSparkML}
 
+/**
+ * @param InputCol
+ * @param MaxIter
+ * @param MaxSentenceLength
+ * @param NumPartitions
+ * @param OutputCol
+ * @param Seed
+ * @param StepSize
+ * @param VectorSize
+ * @param MinCount
+ */
 case class Word2Vec (InputCol: Option[String],
                     MaxIter: Option[Int],
                     MaxSentenceLength: Option[Int],

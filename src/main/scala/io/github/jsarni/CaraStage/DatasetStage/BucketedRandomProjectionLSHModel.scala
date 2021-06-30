@@ -2,6 +2,13 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{BucketedRandomProjectionLSH => fromSparkML}
 
+/**
+ * @param BucketLength
+ * @param InputCol
+ * @param NumHashTables
+ * @param OutputCol
+ * @param Seed
+ */
 case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
                                             InputCol: Option[String],
                                             NumHashTables: Option[Int],

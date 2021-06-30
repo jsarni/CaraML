@@ -2,6 +2,14 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{RegexTokenizer => fromSparkML}
 
+/**
+ * @param Gaps
+ * @param InputCol
+ * @param MinTokenLength
+ * @param OutputCol
+ * @param Pattern
+ * @param ToLowercase
+ */
 case class RegexTokenizer(Gaps: Option[Boolean],
                           InputCol: Option[String],
                           MinTokenLength: Option[Int],

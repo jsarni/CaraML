@@ -2,6 +2,21 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.classification.{LogisticRegression => SparkML}
 
+/**
+ * @param MaxIter
+ * @param RegParam
+ * @param ElasticNetParam
+ * @param Family
+ * @param FeaturesCol
+ * @param FitIntercept
+ * @param PredictionCol
+ * @param ProbabilityCol
+ * @param RawPredictionCol
+ * @param Standardization
+ * @param Thresholds
+ * @param Tol
+ * @param WeightCol
+ */
 case class LogisticRegression(MaxIter: Option[Int],
                               RegParam: Option[Double],
                               ElasticNetParam: Option[Double],

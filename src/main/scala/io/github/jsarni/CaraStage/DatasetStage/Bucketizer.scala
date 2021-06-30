@@ -2,6 +2,15 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{Bucketizer => fromSparkML}
 
+/**
+ * @param HandleInvalid
+ * @param InputCol
+ * @param InputCols
+ * @param OutputCol
+ * @param OutputCols
+ * @param Splits
+ * @param SplitsArray
+ */
 case class Bucketizer(HandleInvalid: Option[String] = Option("error"),
                       InputCol: Option[String],
                       InputCols: Option[Array[String]],

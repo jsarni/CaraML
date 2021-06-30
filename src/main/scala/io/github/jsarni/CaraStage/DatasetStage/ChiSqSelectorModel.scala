@@ -2,6 +2,18 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{ChiSqSelector => fromSparkML}
 
+/**
+ * @param Fdr
+ * @param FeaturesCol
+ * @param Fpr
+ * @param Fwe
+ * @param LabelCol
+ * @param NumTopFeatures
+ * @param OutputCol
+ * @param Percentile
+ * @param SelectorType
+ * @param SelectedFeatures
+ */
 case class ChiSqSelectorModel(Fdr: Option[Double],
                               FeaturesCol: Option[String],
                               Fpr: Option[Double],

@@ -2,6 +2,15 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{CountVectorizer => fromSparkML}
 
+/**
+ * @param Binary
+ * @param InputCol
+ * @param MaxDF
+ * @param MinDF
+ * @param MinTF
+ * @param OutputCol
+ * @param VocabSize
+ */
 case class CountVectorizer(Binary: Option[Boolean],
                            InputCol: Option[String],
                            MaxDF: Option[Double],

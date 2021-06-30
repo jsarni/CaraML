@@ -2,6 +2,24 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.classification.{DecisionTreeClassifier => SparkML}
 
+/**
+ * @param CheckpointInterval
+ * @param FeaturesCol
+ * @param Impurity
+ * @param LabelCol
+ * @param LeafCol
+ * @param MaxBins
+ * @param MaxDepth
+ * @param MinInfoGain
+ * @param MinInstancesPerNode
+ * @param MinWeightFractionPerNode
+ * @param PredictionCol
+ * @param ProbabilityCol
+ * @param RawPredictionCol
+ * @param Seed
+ * @param Thresholds
+ * @param WeightCol
+ */
 case class DecisionTreeClassifier(CheckpointInterval: Option[Int],
                                   FeaturesCol: Option[String],
                                   Impurity: Option[String],

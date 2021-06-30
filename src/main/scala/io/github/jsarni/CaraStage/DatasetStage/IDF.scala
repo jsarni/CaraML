@@ -2,6 +2,11 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{IDF => fromSparkML}
 
+/**
+ * @param InputCol
+ * @param MinDocFreq
+ * @param OutputCol
+ */
 case class IDF(InputCol: Option[String],
                MinDocFreq: Option[Int],
                OutputCol: Option[String])

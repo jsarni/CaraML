@@ -2,6 +2,22 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.regression.{DecisionTreeRegressor => SparkML}
 
+/**
+ * @param CheckpointInterval
+ * @param FeaturesCol
+ * @param Impurity
+ * @param LabelCol
+ * @param LeafCol
+ * @param MaxBins
+ * @param MaxDepth
+ * @param MinInfoGain
+ * @param MinInstancesPerNode
+ * @param MinWeightFractionPerNode
+ * @param PredictionCol
+ * @param Seed
+ * @param VarianceCol
+ * @param WeightCol
+ */
 case class DecisionTreeRegressor(CheckpointInterval: Option[Int],
                                  FeaturesCol: Option[String],
                                  Impurity: Option[String],

@@ -2,6 +2,17 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.classification.{NaiveBayes => SparkML}
 
+/**
+ * @param FeaturesCol
+ * @param LabelCol
+ * @param ModelType
+ * @param PredictionCol
+ * @param ProbabilityCol
+ * @param RawPredictionCol
+ * @param Smoothing
+ * @param Thresholds
+ * @param WeightCol
+ */
 case class NaiveBayes(FeaturesCol: Option[String],
                       LabelCol: Option[String],
                       ModelType: Option[String],

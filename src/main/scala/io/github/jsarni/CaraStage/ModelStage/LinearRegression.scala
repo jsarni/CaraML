@@ -2,6 +2,20 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.regression.{LinearRegression => SparkLR}
 
+/**
+ * @param MaxIter
+ * @param RegParam
+ * @param ElasticNetParam
+ * @param LabelCol
+ * @param Loss
+ * @param FitIntercept
+ * @param PredictionCol
+ * @param FeaturesCol
+ * @param Solver
+ * @param Standardization
+ * @param Tol
+ * @param WeightCol
+ */
 case class LinearRegression(MaxIter: Option[Int],
                             RegParam: Option[Double],
                             ElasticNetParam: Option[Double],

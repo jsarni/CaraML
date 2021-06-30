@@ -2,6 +2,10 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{Tokenizer => fromSparkML}
 
+/**
+ * @param InputCol
+ * @param OutputCol
+ */
 case class Tokenizer(InputCol: Option[String],
                      OutputCol: Option[String])
   extends CaraDataset[fromSparkML] {

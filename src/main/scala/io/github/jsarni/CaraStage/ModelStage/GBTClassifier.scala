@@ -2,6 +2,29 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.classification.{GBTClassifier => SparkML}
 
+/**
+ * @param CheckpointInterval
+ * @param FeaturesCol
+ * @param LabelCol
+ * @param LeafCol
+ * @param MaxBins
+ * @param MaxDepth
+ * @param MinInfoGain
+ * @param MinInstancesPerNode
+ * @param MinWeightFractionPerNode
+ * @param PredictionCol
+ * @param ProbabilityCol
+ * @param RawPredictionCol
+ * @param Seed
+ * @param Thresholds
+ * @param WeightCol
+ * @param FeatureSubsetStrategy
+ * @param SubsamplingRate
+ * @param LossType
+ * @param MaxIter
+ * @param StepSize
+ * @param ValidationIndicatorCol
+ */
 case class GBTClassifier(CheckpointInterval: Option[Int],
                          FeaturesCol: Option[String],
                          LabelCol: Option[String],

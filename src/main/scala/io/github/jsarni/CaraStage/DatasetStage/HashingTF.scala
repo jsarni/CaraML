@@ -2,6 +2,12 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{HashingTF => fromSparkML}
 
+/**
+ * @param Binary
+ * @param InputCol
+ * @param NumFeatures
+ * @param OutputCol
+ */
 case class HashingTF(Binary: Option[Boolean],
                      InputCol: Option[String],
                      NumFeatures: Option[Int],

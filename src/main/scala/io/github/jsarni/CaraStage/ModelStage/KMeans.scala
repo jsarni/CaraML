@@ -2,6 +2,16 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.clustering.{KMeans => SparkML}
 
+/**
+ * @param DistanceMeasure
+ * @param FeaturesCol
+ * @param K
+ * @param MaxIter
+ * @param PredictionCol
+ * @param Seed
+ * @param Tol
+ * @param WeightCol
+ */
 case class KMeans(DistanceMeasure: Option[String],
                   FeaturesCol: Option[String],
                   K: Option[Int],

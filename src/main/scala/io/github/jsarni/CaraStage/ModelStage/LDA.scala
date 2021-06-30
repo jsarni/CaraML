@@ -2,6 +2,18 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.clustering.{LDA => SparkML}
 
+/**
+ * @param CheckpointInterval
+ * @param DocConcentration
+ * @param FeaturesCol
+ * @param K
+ * @param MaxIter
+ * @param Optimizer
+ * @param Seed
+ * @param SubsamplingRate
+ * @param TopicConcentration
+ * @param TopicDistributionCol
+ */
 case class LDA(CheckpointInterval: Option[Int],
                DocConcentration: Option[Array[Double]],
                FeaturesCol: Option[String],

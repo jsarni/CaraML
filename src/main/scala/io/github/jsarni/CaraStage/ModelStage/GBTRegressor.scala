@@ -2,6 +2,28 @@ package io.github.jsarni.CaraStage.ModelStage
 
 import org.apache.spark.ml.regression.{GBTRegressor => SparkML}
 
+/**
+ * @param CheckpointInterval
+ * @param FeaturesCol
+ * @param LabelCol
+ * @param LeafCol
+ * @param MaxBins
+ * @param MaxDepth
+ * @param MinInfoGain
+ * @param MinInstancesPerNode
+ * @param MinWeightFractionPerNode
+ * @param PredictionCol
+ * @param Seed
+ * @param WeightCol
+ * @param FeatureSubsetStrategy
+ * @param SubsamplingRate
+ * @param LossType
+ * @param MaxIter
+ * @param StepSize
+ * @param ValidationIndicatorCol
+ * @param ValidationTol
+ * @param Impurity
+ */
 case class GBTRegressor(CheckpointInterval: Option[Int],
                         FeaturesCol: Option[String],
                         LabelCol: Option[String],
