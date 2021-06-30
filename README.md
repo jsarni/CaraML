@@ -177,5 +177,5 @@ This section lists all available SparkML components that you can use with CaraML
 
 ## *Example*
 
-For practical example you can refer to this [Link](), which is a github project that contain a project using the CaraML framework.
+For practical example you can refer to this [Link](https://github.com/jsarni/CaraMLTest), which is a github project that contain a project using the CaraML framework.
 
