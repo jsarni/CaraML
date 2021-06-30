@@ -10,7 +10,7 @@ import org.apache.spark.ml.{Pipeline, PipelineStage}
 import scala.collection.JavaConverters._
 import scala.util.{Try, Success, Failure}
 
-class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMapper{
+class CaraParser(caraYaml: CaraYamlReader) extends CaraStageMapper{
 
   val contentTry = caraYaml.loadFile()
 
@@ -46,7 +46,7 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
       content <- contentTry
       tunerDesc <- extractTuner(content)
       validatedTunerDesc = mapTuner(tunerDesc)
-      } yield validatedTunerDesc
+    } yield validatedTunerDesc
   }
 
 
@@ -54,7 +54,8 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
   private[PipelineParser] def extractStages(fileContent: JsonNode): Try[List[CaraStageDescription]] = Try {
     val stagesList =
       fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("stage"))
-    val stages = stagesList.map{
+
+    stagesList.map{
       stageDesc =>
         val name = stageDesc.at("/stage").asText()
 
@@ -65,7 +66,7 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
             val paramNames = paramList.flatMap{ r =>r.fieldNames().asScala.toList}
 
             val paramsZip = paramNames zip paramList
-              paramsZip.map{
+              paramsZip.map {
                 paramTuple =>
                   val name = paramTuple._1
                   val value = paramTuple._2.at(s"/$name").asText()
@@ -77,13 +78,10 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
 
         CaraStageDescription(name, paramsMap)
     }
-    stages
   }
 
   private[PipelineParser] def extractEvaluator(fileContent: JsonNode): Try[String] = Try {
-
     val stagesList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("evaluator"))
-
     val evaluatorList = stagesList.map{ stageDesc =>stageDesc.at("/evaluator").asText()}
 
     evaluatorList.length match {
@@ -100,7 +98,6 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
     } yield hasTuner
 
   private[PipelineParser] def extractTuner(fileContent: JsonNode): Try[TuningStageDescription] = {
-
     val tunersList = fileContent.at(s"/CaraPipeline").iterator().asScala.toList.filter(_.has("tuner"))
 
     tunersList.length match {
@@ -124,13 +121,6 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
     }
   }
 
-  private[PipelineParser] def parseStage(stageDescription: CaraStageDescription): Try[Any] =
-    for {
-      stageClass <- Try(Class.forName(s"io.github.jsarni.CaraStage.ModelStage.${stageDescription.stageName}"))
-      constructor <- getMapperConstructor(stageClass)
-      caraStage = constructor.newInstance(stageDescription.params)
-    } yield caraStage
-
   private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): Try[CaraStage[_]] = {
     mapStage(stageDescription)
   }
@@ -144,9 +134,7 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
   }
 
   private[PipelineParser] def buildPipeline(mlStages: List[PipelineStage]): Try[Pipeline] = {
-    Try(new Pipeline()
-      .setStages(mlStages.toArray)
-    )
+    Try(new Pipeline().setStages(mlStages.toArray))
   }
 
 }

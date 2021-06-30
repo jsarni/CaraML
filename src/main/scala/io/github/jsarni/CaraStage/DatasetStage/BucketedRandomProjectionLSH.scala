@@ -1,19 +1,21 @@
 package io.github.jsarni.CaraStage.DatasetStage
 
-import io.github.jsarni.CaraStage.Annotation.MapperConstructor
-import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.feature.{BucketedRandomProjectionLSH => fromSparkML}
 
-import scala.util.Try
-
+/**
+ * @param BucketLength
+ * @param InputCol
+ * @param NumHashTables
+ * @param OutputCol
+ * @param Seed
+ */
 case class BucketedRandomProjectionLSH(BucketLength: Option[Double],
-                                        InputCol: Option[String],
+                                       InputCol: Option[String],
                                        NumHashTables: Option[Int],
                                        OutputCol: Option[String],
                                        Seed: Option[Long])
   extends CaraDataset[fromSparkML] {
 
-  @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
       params.get("BucketLength").map(_.toDouble),
@@ -24,23 +26,10 @@ case class BucketedRandomProjectionLSH(BucketLength: Option[Double],
     )
   }
 
-  @Override
-  override def build(): Try[PipelineStage] = Try{
-
-    val datasetFeature=new fromSparkML()
-    val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
-    val names = definedFields.map(f => f.getName)
-    val values = definedFields.map(f => f.get(this))
-    val zipFields = names zip values
-
-    zipFields.map(f=> getMethode(datasetFeature, f._2 match {case Some(s) => s }, f._1)
-                      .invoke(datasetFeature,(f._2 match {case Some(value) => value.asInstanceOf[f._2.type ] }))
-                 )
-    datasetFeature
-    }
 }
+
 object BucketedRandomProjectionLSH {
-  def apply(params : Map[String,String]): BucketedRandomProjectionLSH = new BucketedRandomProjectionLSH(params)
+  def apply(params: Map[String,String]): BucketedRandomProjectionLSH = new BucketedRandomProjectionLSH(params)
 }
 
 

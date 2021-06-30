@@ -2,6 +2,14 @@ package io.github.jsarni.CaraStage.DatasetStage
 
 import org.apache.spark.ml.feature.{Binarizer => fromSparkML}
 
+/**
+ * @param InputCol
+ * @param InputCols
+ * @param OutputCol
+ * @param OutputCols
+ * @param Threshold
+ * @param Thresholds
+ */
 case class Binarizer(InputCol: Option[String],
                      InputCols: Option[Array[String]],
                      OutputCol: Option[String],

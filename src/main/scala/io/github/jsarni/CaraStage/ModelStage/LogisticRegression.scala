@@ -33,8 +33,8 @@ case class LogisticRegression(MaxIter: Option[Int],
       params.get("Tol").map(_.toDouble),
       params.get("WeightCol")
     )
-
   }
+
 }
 
 object LogisticRegression {
