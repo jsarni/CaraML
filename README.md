@@ -172,7 +172,7 @@ This section lists all available SparkML components that you can use with CaraML
 
 
 ## *CamaML schema*
-![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pngegg.com%2Ffr%2Fpng-eojek&psig=AOvVaw3j4R89mTu2QtXRKaZWujCC&ust=1625150913087000&source=images&cd=vfe&ved=0CAoQjRxqFwoTCPDl-YzNv_ECFQAAAAAdAAAAABAD)
+![alt text](https://github.com/jsarni/CaraML/blob/feature/readme_documentation/PA.PNG?raw=true)
 
 
 ## *Example*
