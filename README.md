@@ -171,6 +171,10 @@ This section lists all available SparkML components that you can use with CaraML
 - MulticlassClassificationEvaluator [Documontation](https://spark.apache.org/docs/latest/mllib-evaluation-metrics.html)
 
 
+## *CamaML schema*
+![alt text](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pngegg.com%2Ffr%2Fpng-eojek&psig=AOvVaw3j4R89mTu2QtXRKaZWujCC&ust=1625150913087000&source=images&cd=vfe&ved=0CAoQjRxqFwoTCPDl-YzNv_ECFQAAAAAdAAAAABAD)
+
+
 ## *Example*
 
 For practical example you can refer to this [Link](), which is a github project that contain a project using the CaraML framework.
