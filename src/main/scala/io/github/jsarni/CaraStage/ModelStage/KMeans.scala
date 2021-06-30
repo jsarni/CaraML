@@ -9,7 +9,7 @@ import scala.util.Try
 case class KMeans(DistanceMeasure : Option[String], FeaturesCol : Option[String], K : Option[Int], MaxIter : Option[Int],
                   PredictionCol : Option[String], Seed : Option[Long], Tol : Option[Double], WeightCol : Option[String] )
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

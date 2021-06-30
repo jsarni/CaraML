@@ -3,17 +3,18 @@ package io.github.jsarni.CaraStage
 import io.github.jsarni.CaraStage.DatasetStage.CaraDataset
 import io.github.jsarni.CaraStage.ModelStage._
 import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
+import org.apache.spark.ml.PipelineStage
 import org.apache.spark.ml.evaluation._
 
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 trait CaraStageMapper {
 
-  def mapStage(stageDescription: CaraStageDescription): Try[CaraStage] = Try {
+  def mapStage(stageDescription: CaraStageDescription): Try[CaraStage[_ <: PipelineStage]] = Try {
     Try(mapModelStage(stageDescription)).getOrElse(mapDatasetStage(stageDescription))
   }
 
-  def mapModelStage(stageDescription: CaraStageDescription): CaraModel = {
+  def mapModelStage(stageDescription: CaraStageDescription): CaraModel[_ <: PipelineStage] = {
     stageDescription.stageName match {
       case "LogisticRegression" =>
         LogisticRegression(stageDescription.params)
@@ -42,7 +43,7 @@ trait CaraStageMapper {
     }
   }
 
-  def mapDatasetStage(stageDescription: CaraStageDescription): CaraDataset = {
+  def mapDatasetStage(stageDescription: CaraStageDescription): CaraDataset[_ <: PipelineStage] = {
     stageDescription.stageName match {
       case _ =>
         throw

@@ -12,7 +12,7 @@ case class DecisionTreeRegressor(
                                  PredictionCol: Option[String], Seed: Option[Long], VarianceCol: Option[String], WeightCol: Option[String]
                                 )
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

@@ -12,7 +12,7 @@ case class CountVectorizer(Binary:Option[Boolean],
                            MinDF:Option[Double],
                            MinTF:Option[Double],
                            OutputCol: Option[String],
-                           VocabSize: Option[Int]) extends CaraDataset {
+                           VocabSize: Option[Int]) extends CaraDataset[fromSparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {
@@ -28,7 +28,7 @@ case class CountVectorizer(Binary:Option[Boolean],
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

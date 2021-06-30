@@ -1,12 +1,35 @@
 package io.github.jsarni.CaraStage
 
 import org.apache.spark.ml.PipelineStage
+
 import java.lang.reflect.Method
+import scala.reflect.ClassTag
 import scala.util.Try
 
-trait CaraStage {
+abstract class CaraStage[T <: PipelineStage](implicit classTag: ClassTag[T]) {
 
-  def build(): Try[PipelineStage]
+  private[this] def newInstance() = {
+    classTag.runtimeClass.getConstructors.filter(_.getParameterCount == 0).head.newInstance().asInstanceOf[PipelineStage]
+  }
+
+  def build(): Try[PipelineStage] = for {
+          allFields <- Try(this.getClass.getDeclaredFields)
+          _ = allFields.map(_.setAccessible(true))
+          pipelineStage = newInstance()
+          definedFields = allFields.filter(_.get(this).asInstanceOf[Option[Any]].isDefined)
+          names = definedFields.map(_.getName)
+          values = definedFields.map(field => field.get(this).asInstanceOf[Some[field.type]])
+          zipFields = names zip values
+
+          _ = zipFields.map { f =>
+            val fieldName = f._1
+            val fieldValue = f._2
+
+            getMethode(pipelineStage, fieldValue.get, fieldName)
+              .invoke(pipelineStage, fieldValue.get)
+          }
+      } yield pipelineStage
+
 
   // Function to get methode by name and do invoke with the right params types and values
   def getMethode(stage : PipelineStage, field : Any, fieldName : String): Method = {

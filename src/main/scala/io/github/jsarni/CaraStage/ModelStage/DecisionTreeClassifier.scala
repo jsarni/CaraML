@@ -12,7 +12,7 @@ case class DecisionTreeClassifier(
                                    WeightCol: Option[String]
                                  )
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

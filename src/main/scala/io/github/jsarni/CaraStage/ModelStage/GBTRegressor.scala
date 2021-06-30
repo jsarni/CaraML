@@ -14,7 +14,7 @@ case class GBTRegressor(
                        )
 
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

@@ -10,7 +10,7 @@ case class LDA(CheckpointInterval : Option[Int], DocConcentration : Option[Array
                Optimizer : Option[String], Seed : Option[Long], SubsamplingRate : Option[Double], TopicConcentration : Option[Double], TopicDistributionCol : Option[String],
               )
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

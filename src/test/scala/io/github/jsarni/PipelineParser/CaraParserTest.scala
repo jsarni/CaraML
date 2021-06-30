@@ -42,7 +42,7 @@ class CaraParserTest extends TestBase {
     val stageDesc =
       CaraStageDescription("LogisticRegression", params)
 
-    val parseSingleStageMap = PrivateMethod[Try[CaraStage]]('parseSingleStageMap)
+    val parseSingleStageMap = PrivateMethod[Try[CaraStage[_ <: PipelineStage]]]('parseSingleStageMap)
 
     val res = caraParser.invokePrivate(parseSingleStageMap(stageDesc))
 
@@ -66,7 +66,7 @@ class CaraParserTest extends TestBase {
 
     val expectedResult = List(LogisticRegression(params1), LogisticRegression(params2))
 
-    val parseStages = PrivateMethod[Try[List[CaraStage]]]('parseStages)
+    val parseStages = PrivateMethod[Try[List[CaraStage[_ <: PipelineStage]]]]('parseStages)
     val res = caraParser.invokePrivate(parseStages(stagesDesc))
 
     res.isSuccess shouldBe true

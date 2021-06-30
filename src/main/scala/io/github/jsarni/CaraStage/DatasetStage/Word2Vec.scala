@@ -15,7 +15,7 @@ case class Word2Vec (InputCol: Option[String],
                     StepSize: Option[Double],
                     VectorSize: Option[Int],
                     MinCount: Option[Int])
-  extends CaraDataset {
+  extends CaraDataset[fromSparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {
@@ -33,7 +33,7 @@ case class Word2Vec (InputCol: Option[String],
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

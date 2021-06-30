@@ -16,7 +16,7 @@ case class ChiSqSelectorModel(Fdr: Option[Double],
                               Percentile:Option[Double],
                               SelectorType:Option[String],
                               SelectedFeatures: Option[Array[Int]]
-) extends CaraDataset {
+) extends CaraDataset[fromSparkML] {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -34,7 +34,7 @@ case class ChiSqSelectorModel(Fdr: Option[Double],
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

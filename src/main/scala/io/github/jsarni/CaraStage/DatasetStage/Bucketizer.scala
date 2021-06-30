@@ -13,7 +13,7 @@ case class Bucketizer( HandleInvalid: Option[String]=Option("error"),
                        OutputCols: Option[Array[String]],
                        Splits: Option[Array[Double]],
                       SplitsArray: Option[Array[Array[Double]]]
-                     ) extends CaraDataset {
+                     ) extends CaraDataset[fromSparkML] {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -28,7 +28,7 @@ case class Bucketizer( HandleInvalid: Option[String]=Option("error"),
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

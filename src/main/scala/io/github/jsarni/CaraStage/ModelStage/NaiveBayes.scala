@@ -7,7 +7,7 @@ import scala.util.Try
 case class NaiveBayes(FeaturesCol : Option[String], LabelCol : Option[String], ModelType : Option[String], PredictionCol : Option[String], ProbabilityCol : Option[String],
                       RawPredictionCol : Option[String], Smoothing : Option[Double], Thresholds : Option[Array[Double]], WeightCol : Option[String])
 
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

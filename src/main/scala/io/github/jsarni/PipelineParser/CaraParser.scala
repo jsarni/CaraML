@@ -131,15 +131,15 @@ class CaraParser(caraYaml: CaraYamlReader) extends ParserUtils with CaraStageMap
       caraStage = constructor.newInstance(stageDescription.params)
     } yield caraStage
 
-  private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): Try[CaraStage] = {
+  private[PipelineParser] def parseSingleStageMap(stageDescription: CaraStageDescription): Try[CaraStage[_]] = {
     mapStage(stageDescription)
   }
 
-  private[PipelineParser] def parseStages(stagesDescriptionsList: List[CaraStageDescription]): Try[List[CaraStage]] = {
+  private[PipelineParser] def parseStages(stagesDescriptionsList: List[CaraStageDescription]): Try[List[CaraStage[_]]] = {
     Try(stagesDescriptionsList.map(parseSingleStageMap(_).get))
   }
 
-  private[PipelineParser] def buildStages(stagesList: List[CaraStage]): Try[List[PipelineStage]] = {
+  private[PipelineParser] def buildStages(stagesList: List[CaraStage[_]]): Try[List[PipelineStage]] = {
     Try(stagesList.map(_.build().get))
   }
 

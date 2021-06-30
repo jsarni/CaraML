@@ -12,7 +12,7 @@ case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
                                             NumHashTables: Option[Int],
                                             OutputCol: Option[String],
                                             Seed: Option[Long])
-  extends CaraDataset {
+  extends CaraDataset[fromSparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {
@@ -26,7 +26,7 @@ case class BucketedRandomProjectionLSHModel(BucketLength: Option[Double],
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val randUnitVectors = Array(Vectors.dense(10,10))
 

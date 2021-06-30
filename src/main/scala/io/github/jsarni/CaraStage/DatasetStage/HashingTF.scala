@@ -8,7 +8,7 @@ import scala.util.Try
 case class HashingTF(Binary:Option[Boolean],
                      InputCol:Option[String],
                      NumFeatures:Option[Int],
-                     OutputCol: Option[String]) extends CaraDataset {
+                     OutputCol: Option[String]) extends CaraDataset[fromSparkML] {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -20,7 +20,7 @@ case class HashingTF(Binary:Option[Boolean],
   }
 
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

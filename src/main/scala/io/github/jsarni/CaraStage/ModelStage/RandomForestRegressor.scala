@@ -11,7 +11,7 @@ case class RandomForestRegressor(
                                   PredictionCol: Option[String], Seed: Option[Long], WeightCol: Option[String], FeatureSubsetStrategy: Option[String], SubsamplingRate: Option[Double],
                                   NumTrees: Option[Int]
                                 )
-  extends CaraModel {
+  extends CaraModel[SparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

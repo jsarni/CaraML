@@ -6,7 +6,7 @@ import org.apache.spark.ml.feature.{Tokenizer => fromSparkML}
 import scala.util.Try
 case class Tokenizer(InputCol:Option[String],
                      OutputCol: Option[String])
-  extends CaraDataset {
+  extends CaraDataset[fromSparkML] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {
@@ -16,7 +16,7 @@ case class Tokenizer(InputCol:Option[String],
     )
   }
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

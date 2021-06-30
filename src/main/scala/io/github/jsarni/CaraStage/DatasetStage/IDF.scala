@@ -8,7 +8,7 @@ import scala.util.Try
 case class IDF(InputCol:Option[String],
                MinDocFreq:Option[Int],
                OutputCol: Option[String])
-  extends CaraDataset {
+  extends CaraDataset[fromSparkML] {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -18,7 +18,7 @@ case class IDF(InputCol:Option[String],
     )
   }
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)

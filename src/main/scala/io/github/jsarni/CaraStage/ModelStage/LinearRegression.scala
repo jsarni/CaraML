@@ -10,7 +10,7 @@ case class LinearRegression(MaxIter: Option[Int], RegParam: Option[Double], Elas
                             FitIntercept: Option[Boolean], PredictionCol: Option[String], FeaturesCol: Option[String], Solver: Option[String],
                             Standardization: Option[Boolean], Tol : Option[Double], WeightCol: Option[String])
 
-  extends CaraModel {
+  extends CaraModel[SparkLR] {
 
   @MapperConstructor
   def this(params: Map[String, String]) = {

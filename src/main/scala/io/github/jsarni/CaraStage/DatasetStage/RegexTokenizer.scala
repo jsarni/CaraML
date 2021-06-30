@@ -11,7 +11,7 @@ case class RegexTokenizer(Gaps:Option[Boolean],
                           OutputCol: Option[String],
                           Pattern: Option[String],
                           ToLowercase : Option[Boolean])
-  extends CaraDataset {
+  extends CaraDataset[fromSparkML] {
   @MapperConstructor
   def this(params: Map[String, String]) = {
     this(
@@ -24,7 +24,7 @@ case class RegexTokenizer(Gaps:Option[Boolean],
     )
   }
   @Override
-  def build(): Try[PipelineStage] = Try{
+  override def build(): Try[PipelineStage] = Try{
 
     val datasetFeature=new fromSparkML()
     val definedFields = this.getClass.getDeclaredFields.filter(f => f.get(this).asInstanceOf[Option[Any]].isDefined)
