@@ -24,11 +24,10 @@ class CaraParserTest extends TestBase {
     val extractStages = PrivateMethod[Try[List[CaraStageDescription]]]('extractStages)
     val result = caraParser.invokePrivate(extractStages(myJson.get))
 
-    val expectedResult =
-      Seq(
-        CaraStageDescription("LogisticRegression", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")),
-        CaraStageDescription("FeatureSelection", Map("Param1" -> "S", "Param2" -> "0.5", "Param3" -> "false"))
-      )
+    val expectedResult = Seq(
+      CaraStageDescription("LogisticRegression", Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")),
+      CaraStageDescription("FeatureSelection", Map("Param1" -> "S", "Param2" -> "0.5", "Param3" -> "false"))
+    )
 
     result.isSuccess shouldBe true
     result.get should contain theSameElementsAs expectedResult
@@ -39,9 +38,7 @@ class CaraParserTest extends TestBase {
     val caraParser = CaraParser(CaraYamlReader(caraPath))
 
     val params = Map("MaxIter" -> "10", "RegParam" -> "0.3", "ElasticNetParam" -> "0.1")
-    val stageDesc =
-      CaraStageDescription("LogisticRegression", params)
-
+    val stageDesc = CaraStageDescription("LogisticRegression", params)
     val parseSingleStageMap = PrivateMethod[Try[CaraStage[_ <: PipelineStage]]]('parseSingleStageMap)
 
     val res = caraParser.invokePrivate(parseSingleStageMap(stageDesc))
