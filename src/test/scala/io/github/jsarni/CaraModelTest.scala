@@ -1,7 +1,8 @@
 package io.github.jsarni
 
-import io.github.jsarni.carastage.tuningstage.TuningStageDescription
-import io.github.jsarni.pipelineparser.CaraPipeline
+import io.github.jsarni.caraml.CaraModel
+import io.github.jsarni.caraml.carastage.tuningstage.TuningStageDescription
+import io.github.jsarni.caraml.pipelineparser.CaraPipeline
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, RegressionEvaluator}
 import org.apache.spark.ml.regression.LinearRegression
