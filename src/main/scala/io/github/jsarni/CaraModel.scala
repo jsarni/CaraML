@@ -4,16 +4,25 @@ package io.github.jsarni
 
 import io.github.jsarni.CaraYaml.CaraYamlReader
 import io.github.jsarni.PipelineParser.{CaraParser, CaraPipeline}
-import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, GBTClassificationModel, LogisticRegressionModel, RandomForestClassificationModel}
+import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, GBTClassificationModel, LogisticRegressionModel, NaiveBayes, NaiveBayesModel, RandomForestClassificationModel}
+import org.apache.spark.mllib.clustering.{KMeansModel, LDAModel}
 import org.apache.spark.ml.regression.LinearRegressionModel
-import org.apache.spark.ml.{Pipeline, PipelineModel, classification}
+import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer, classification}
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 
 import scala.util.Try
+import scala.util.control.Breaks._
 import java.io._
+import java.nio._
+import java.nio.file.{Files, Paths}
 import java.sql.Timestamp
 import java.time.Instant
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
+
+
+import org.apache.spark.ml.clustering.KMeans
 
 import scala.collection.mutable
 
@@ -31,121 +40,215 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
   } yield ()
 
 
-  def writeFile(filename: String, lines: mutable.SortedMap[String,Any]): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    for ((field,value) <- lines) {
-      println(s"$field : $value")
-      bw.write(s"$field ; $value")
-      bw.write("\n")
-    }
-    bw.close()
-  }
-  private def generateReport(model: PipelineModel) : Try[Unit] =Try {
-    val stagesModel=model.stages.last
+  def writeHTMLFile(filename: String, ArrayStages: Array[mutable.SortedMap[String,Any]]): Unit = {
+
+    //Save the Logo Img to the directory
+    val logoIMG  = new File(filename + s"/caraML_logo_200x100.png")
+    val logoRead = ImageIO.read(new File("src/main/resources/caraML_logo_200x100.png"))
+    ImageIO.write(logoRead, "png", logoIMG)
+
+    //Create the file
     val rapportDate: String= Timestamp.from(Instant.now()).toString.replace(" ","-")
+    val fileHTML = new File(filename + s"/ModelMetrics_$rapportDate.html")
+    val fileBufferWriter = new BufferedWriter(new FileWriter(fileHTML))
+
+    // Load HTML Component
+    val headHTML = new String(Files.readAllBytes(Paths.get("src/main/resources/header.txt")))
+    val bodyPartOne = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part1.txt")))
+    val bodyPartTwo = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part2.txt")))
+
+    val firstPart ="<tr style=\"height: 18px;\">\n <th scope=\"row\"></th>\n <td>"
+    val secondPart = "</td>\n<td>"
+
+    // Write HTML Skeleton
+    fileBufferWriter.write(headHTML)
+
+      for (lines <- ArrayStages) {
+
+        // Inject Model Metrics
+        val modelName = lines.map(line => if (line._1 == "Model Name") line._2 else new String(""))
+          .toList
+          .filter(p => p.asInstanceOf[String].length > 0)
+          .mkString
+
+        // If the Stage dont have Metrics : print only the Stage Name
+        if (modelName.endsWith("display")) {
+          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div>")
+
+        }
+        else{
+
+          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div>" + bodyPartTwo)
+
+          for ((field, value) <- lines) {
+
+            fileBufferWriter.write(s"$firstPart $field $secondPart $value </td> </tr>")
+        }
+          fileBufferWriter.write("</tbody>\n </table>\n </div>\n")
+        }
+      }
+    fileBufferWriter.write("</body>\n</html>")
+    fileBufferWriter.close()
+  }
+
+  private def generateReport(model: PipelineModel) : Try[Unit] = Try{
+
+    val StageMetrics = model.stages.map(stage => getStageMetrics(stage).get )
+    writeHTMLFile(savePath ,StageMetrics)
+
+  }
+  private def getStageMetrics(stage: Transformer) : Try[mutable.SortedMap[String,Any]] =Try {
+
+    val stagesModel=stage
+    val rapportDate: String= Timestamp.from(Instant.now()).toString.replace(" ","-")
+
     stagesModel match {
+
       case m: DecisionTreeClassificationModel => {
 
         val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics = mutable.SortedMap(
+        mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Raport Date Generation"        -> rapportDate,
-                              "featureImportances"            -> m.featureImportances.toArray.toList,
-                              "numFeatures"                   -> m.numFeatures,
-                              "featuresCol"                   -> m.featuresCol.name)
-        writeFile(savePath+ s"/ModelResults.txt",modelMetrics)
+                              "Feature Importances"           -> m.featureImportances.toArray.toList.mkString,
+                              "Number of Features"            -> m.numFeatures,
+                              "features Column"               -> m.featuresCol.name
+        )
+
       }
+
       case m: LogisticRegressionModel => {
+
         val summ=m.summary
         val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics= mutable.SortedMap(
+        mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Report Date Generation"        -> rapportDate,
                               "Accuracy"                      -> summ.accuracy,
-                              "features Col"                  -> summ.featuresCol,
-                              "fMeasure By Label"             -> summ.fMeasureByLabel.toList,
-                              "false Positive Rate By Label"  -> summ.falsePositiveRateByLabel.toList,
-                              "labelCol"                      -> summ.labelCol,
-                              "labels"                        -> summ.labels.toList,
-                              "objective History"             -> summ.objectiveHistory.toList,
-                              "probability Col"               -> summ.probabilityCol,
-                              "true Positive Rate By Label"   -> summ.truePositiveRateByLabel.toList,
-                              "total Iterations"              -> summ.totalIterations,
-                              "prediction Col"                -> summ.predictionCol,
-                              "precision By Label"            -> summ.precisionByLabel.toList,
-                              "recall By  Label"              -> summ.recallByLabel.toList,
-                              "weighted Recall"               -> summ.weightedRecall,
-                              "weighted True Positive Rate"   -> summ.weightedTruePositiveRate,
-                              "weight Col"                    -> summ.weightCol,
-                              "weighted False Positive Rate"  -> summ.weightedFalsePositiveRate,
-                              "weighted FMeasure"             -> summ.weightedFMeasure
-                          )
-        writeFile(savePath+ s"/ModelResults.txt",modelMetrics)
+                              "Features Columns"              -> summ.featuresCol,
+                              "FMeasure By Label"             -> summ.fMeasureByLabel.toList.mkString(" \n"),
+                              "False Positive Rate By Label"  -> summ.falsePositiveRateByLabel.toList.mkString(" \n"),
+                              "Label Column"                  -> summ.labelCol,
+                              "Labels"                        -> summ.labels.toList.mkString(" \n"),
+                              "Objective History"             -> summ.objectiveHistory.toList.mkString(" \n"),
+                              "Probability Column"            -> summ.probabilityCol.mkString("\n"),
+                              "True Positive Rate By Label"   -> summ.truePositiveRateByLabel.toList.mkString(" \n"),
+                              "Total Iterations"              -> summ.totalIterations,
+                              "Prediction Column"             -> summ.predictionCol,
+                              "Precision By Label"            -> summ.precisionByLabel.toList.mkString(" \n"),
+                              "Recall By  Label"              -> summ.recallByLabel.toList.mkString(" \n"),
+                              "Weighted Recall"               -> summ.weightedRecall,
+                              "Weighted True Positive Rate"   -> summ.weightedTruePositiveRate,
+                              "Weight Column"                 -> summ.weightCol,
+                              "Weighted False Positive Rate"  -> summ.weightedFalsePositiveRate,
+                              "Weighted FMeasure"             -> summ.weightedFMeasure
+        )
+
       }
+
       case m: LinearRegressionModel   => {
 
         val summ = m.summary
         val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics= mutable.SortedMap(
+        mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Report Date Generation"        -> rapportDate,
-                              "objectiveHistory"              -> summ.objectiveHistory.toList,
-                              "totalIterations"               -> summ.totalIterations,
-                              "coefficientStandardErrors"     -> summ.coefficientStandardErrors.toList,
-                              "degreesOfFreedom"              -> summ.degreesOfFreedom,
-                              "devianceResiduals"             -> summ.devianceResiduals.toList,
-                              "explainedVariance"             -> summ.explainedVariance,
-                              "featuresCol"                   -> summ.featuresCol,
-                              "labelCol"                      -> summ.labelCol,
-                              "meanAbsoluteError"             -> summ.meanAbsoluteError,
-                              "meanSquaredError"              -> summ.meanSquaredError,
-                              "numInstances"                  -> summ.numInstances,
-                              "predictionCol"                 -> summ.predictionCol,
-                              "pValues"                       -> summ.pValues.toList,
-                              "r2"                            -> summ.r2,
-                              "r2adj"                         -> summ.r2adj,
-                              "rootMeanSquaredError"          -> summ.rootMeanSquaredError,
-                              "tValues"                       -> summ.tValues.toList)
-        writeFile(savePath+ s"/ModelResults.txt",modelMetrics)
-      }
-      case m: GBTClassificationModel   => {
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics = mutable.SortedMap(
-          "Model Name"                    -> modelName,
-          "Raport Date Generation"        -> rapportDate,
-          "featureImportances"            -> m.featureImportances.toArray.toList,
-          ""                              -> m.numFeatures,
-          ""                              -> m.featuresCol,
-          ""                              -> m.getNumTrees,
-          ""                              -> m.toString())
-        writeFile(savePath+ s"/ModelResults.txt",modelMetrics)
+                              "Objective History"             -> summ.objectiveHistory.toList.mkString,
+                              "Total Iterations"              -> summ.totalIterations,
+                              "Coefficient Standard Errors"   -> summ.coefficientStandardErrors.toList.mkString,
+                              "Degrees Of Freedom"            -> summ.degreesOfFreedom,
+                              "Deviance Residuals"            -> summ.devianceResiduals.toList.mkString,
+                              "Explained Variance"            -> summ.explainedVariance,
+                              "Features Column"               -> summ.featuresCol,
+                              "Label Column"                  -> summ.labelCol,
+                              "Mean Absolute Error"           -> summ.meanAbsoluteError,
+                              "Mean Squared Error"            -> summ.meanSquaredError,
+                              "Number of Instances"           -> summ.numInstances,
+                              "Prediction Column"             -> summ.predictionCol,
+                              "PValues"                       -> summ.pValues.toList.mkString,
+                              "R2"                            -> summ.r2,
+                              "R2adj"                         -> summ.r2adj,
+                              "Root Mean Squared Error"       -> summ.rootMeanSquaredError,
+                              "TValues"                       -> summ.tValues.toList.mkString
+        )
 
       }
+
+      case m: GBTClassificationModel   => {
+
+        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Raport Date Generation"        -> rapportDate,
+          "Feature Importances"           -> m.featureImportances.toArray.toList.mkString,
+          "Number of Features"            -> m.numFeatures,
+          "Features Column"               -> m.featuresCol.name,
+          "Number of Trees"               -> m.getNumTrees
+        )
+
+
+      }
+
       case m:RandomForestClassificationModel => {
+
         val summ = m.summary
         val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        val modelMetrics= mutable.SortedMap(
+        mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
-          "accuracy"                      -> summ.accuracy,
-          "weightedTruePositiveRate"      -> summ.weightedTruePositiveRate,
-          "totalIterations"               -> summ.totalIterations,
-          "objectiveHistory"              -> summ.objectiveHistory.toList,
-          "recallByLabel"                 -> summ.recallByLabel.toList,
-          "weightedRecall"                -> summ.weightedRecall,
-          "precisionByLabel"              -> summ.precisionByLabel.toList,
-          "labels"                        -> summ.labels.toList,
-          "labelCol"                      -> summ.labelCol,
-          "predictionCol"                 -> summ.predictionCol,
-          "falsePositiveRateByLabel"      -> summ.falsePositiveRateByLabel.toList,
-          "weightCol"                     -> summ.weightCol,
-          "fMeasureByLabel"               -> summ.fMeasureByLabel.toList,
-          "weightedFMeasure"              -> summ.weightedFMeasure,
-          "weightedPrecision"             -> summ.weightedPrecision
+          "Accuracy"                      -> summ.accuracy,
+          "Weighted True Positive Rate"   -> summ.weightedTruePositiveRate,
+          "Total Iterations"              -> summ.totalIterations,
+          "Objective History"             -> summ.objectiveHistory.toList.mkString,
+          "Recall By Label"               -> summ.recallByLabel.toList.mkString,
+          "Weighted Recall"               -> summ.weightedRecall,
+          "Precision By Label"            -> summ.precisionByLabel.toList.mkString,
+          "Labels"                        -> summ.labels.toList.mkString,
+          "Label Column"                  -> summ.labelCol,
+          "Prediction Column"             -> summ.predictionCol,
+          "False Positive Rate By Label"  -> summ.falsePositiveRateByLabel.toList.mkString,
+          "Weight Column"                 -> summ.weightCol,
+          "FMeasure By Label"             -> summ.fMeasureByLabel.toList.mkString,
+          "Weighted FMeasure"             -> summ.weightedFMeasure,
+          "Weighted Precision"            -> summ.weightedPrecision
         )
       }
 
+      case m: KMeansModel => {
+        val km= m.asInstanceOf[KMeansModel]
+
+        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate)
+
+      }
+      case m : LDAModel  => {
+        val summ = m
+        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+        mutable.SortedMap(
+        "Model Name"                    -> modelName,
+        "Report Date Generation"        -> rapportDate,
+        "k"                             ->  m.k,
+        )
+
+      }
+      case m : NaiveBayesModel => {
+
+        val summ = m
+        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "Pi"                            -> m.pi.toArray.toList.mkString,
+          "Sigma"                         -> m.sigma.toArray.toList.mkString,
+          "Theta"                         -> m.theta.toArray.toList.mkString)
+
+      }
+      case m => {
+        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+        mutable.SortedMap("Model Name" -> s"$modelName : This Stage has no Metrics to display")
+      }
     }
   }
 

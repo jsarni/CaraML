@@ -1,19 +1,20 @@
 package io.github.jsarni
 import io.github.jsarni.CaraStage.DatasetStage._
-import io.github.jsarni.CaraStage.ModelStage.LogisticRegression
+import io.github.jsarni.CaraStage.ModelStage.{KMeans, LogisticRegression}
 import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
 import io.github.jsarni.PipelineParser.CaraPipeline
 import org.apache.avro.generic.GenericData.StringType
-import org.apache.spark.ml.{Pipeline, classification, feature}
+import org.apache.spark.ml.{Pipeline, classification, clustering, feature}
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, RegressionEvaluator}
 import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.tuning.{CrossValidator, TrainValidationSplit}
+import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 
 import scala.util.Try
-
+import org.apache.spark.ml.clustering.{KMeans, LDA}
 
 class CaraModelTest extends TestBase {
   "generateModel" should "Return validation model with the right method and params" in {
@@ -83,11 +84,17 @@ class CaraModelTest extends TestBase {
 
   val logi = LogisticRegression(Map("MaxIter"->"10")).build().get
 
-  val caraModel = new CaraModel("YamlPath", labelsDf, "savePath")(spark)
+
+  val caraModel = new CaraModel("YamlPath", Data, "/home/aghylassai/Bureau/PA/")(spark)
   val pipeline = new Pipeline()
-    .setStages(Array(logi))
+    .setStages(Array(assembler,indexer,logi))
+
+
+
   val method = PrivateMethod[Try[Unit]]('generateReport)
-  val fited=pipeline.fit(labelsDf)
+  val fited=pipeline.fit(Data)
   val crossModels = caraModel.invokePrivate(method(fited)).get
-  }
+
+
+}
 }

@@ -1,0 +1,11 @@
+<!-- Put Model Name--> <!--Block2 BEGIN--></strong>
+    <table  class ="table table-striped " style=" width: 500px; ">
+      <thead class="thead-blue" >
+        <tr style="height: 18px;">
+          <th scope="col"> </th>
+            <th scope="col"> Metric</th>
+            <th scope="col"> Value </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--Block2 END-->
