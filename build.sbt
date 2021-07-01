@@ -2,17 +2,25 @@ scalaVersion := "2.12.13"
 
 name := "CaraML"
 
-version := "1.0.0"
+version := "1.0.0-SNAPSHOT"
 
 organization := "io.github.jsarni"
 homepage := Some(url("https://github.com/jsarni/CaraML"))
 scmInfo := Some(ScmInfo(url("https://github.com/jsarni/CaraML"), "git@github.com:jsarni/CaraML.git"))
-developers :=
-  List(
+developers := List(
     Developer("Juba", "SARNI", "juba.sarni@gmail.com", url("https://github.com/jsarni")),
     Developer("Merzouk", "OUMEDDAH", "merzoukoumeddah@gmail.com ", url("https://github.com/merzouk13")),
     Developer("Aghylas", "SAI", "aghilassai@gmail.com", url("https://github.com/SAI-Aghylas"))
-  )
+)
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+publishMavenStyle := true
+
+publishTo := Some(
+    if (isSnapshot.value)
+      "Sonatype Snapshots Nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
+    else
+      "Sonatype Releases Nexus" at "https://s01.oss.sonatype.org/content/repositories/releases"
+)
 
 // Dependencies
 val scalaTest = "org.scalatest" %% "scalatest" % "3.2.7" % Test
@@ -33,5 +41,4 @@ lazy val caraML = (project in file("."))
     libraryDependencies += jacksonCore,
     libraryDependencies += jacksonDataformat,
     libraryDependencies += jacksonAnnotation
-
   )
