@@ -1,3 +1,3 @@
-<div style="width: 500px;" class="shadow p-1 mb-1 bg-body">
-        <div style="width: 500px;" class=" p-3 mb-2 bg-secondary text-white" >
-          <p style="color: #FFFFFF; height: 10px ; "class="text-center"> <strong><!--Block1 END-->
+<div id="Stage Name/ Model Name Gray" style="width: 500px;" class="shadow p-1 mb-1 bg-body">
+        <div class=" p-3 mb-2 bg-secondary text-white" >
+          <p style="color: #FFFFFF; height: 10px ; "class="text-center"> <!--Block1 END-->

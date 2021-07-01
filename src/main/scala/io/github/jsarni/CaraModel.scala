@@ -73,16 +73,16 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
 
         // If the Stage dont have Metrics : print only the Stage Name
         if (modelName.endsWith("display")) {
-          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div>")
+          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div>\n")
 
         }
         else{
 
-          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div>" + bodyPartTwo)
+          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div> \n" + bodyPartTwo)
 
           for ((field, value) <- lines) {
 
-            fileBufferWriter.write(s"$firstPart $field $secondPart $value </td> </tr>")
+            fileBufferWriter.write(s"$firstPart $field $secondPart $value </td> </tr> \n")
         }
           fileBufferWriter.write("</tbody>\n </table>\n </div>\n")
         }
@@ -131,7 +131,7 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
                               "Label Column"                  -> summ.labelCol,
                               "Labels"                        -> summ.labels.toList.mkString(" \n"),
                               "Objective History"             -> summ.objectiveHistory.toList.mkString(" \n"),
-                              "Probability Column"            -> summ.probabilityCol.mkString("\n"),
+                              "Probability Column"            -> summ.probabilityCol.mkString,
                               "True Positive Rate By Label"   -> summ.truePositiveRateByLabel.toList.mkString(" \n"),
                               "Total Iterations"              -> summ.totalIterations,
                               "Prediction Column"             -> summ.predictionCol,
