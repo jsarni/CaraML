@@ -1,6 +1,8 @@
 package io.github.jsarni
-import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
-import io.github.jsarni.PipelineParser.CaraPipeline
+
+import io.github.jsarni.caraml.CaraModel
+import io.github.jsarni.caraml.carastage.tuningstage.TuningStageDescription
+import io.github.jsarni.caraml.pipelineparser.CaraPipeline
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, RegressionEvaluator}
 import org.apache.spark.ml.regression.LinearRegression
@@ -8,7 +10,6 @@ import org.apache.spark.ml.tuning.{CrossValidator, TrainValidationSplit}
 import org.apache.spark.sql.SparkSession
 
 import scala.util.Try
-
 
 class CaraModelTest extends TestBase {
   "generateModel" should "Return validation model with the right method and params" in {
@@ -27,8 +28,7 @@ class CaraModelTest extends TestBase {
         .getOrCreate()
 
     val caraModel = new CaraModel("YamlPath", spark.emptyDataFrame,  "savePath")
-    val pipeline = new Pipeline()
-      .setStages(Array(lr))
+    val pipeline = new Pipeline().setStages(Array(lr))
     val crossCaraPipeline = CaraPipeline(pipeline, crossEvaluator, Some(crossTuner))
     val splitCaraPipeline = CaraPipeline(pipeline, splitEvaluator, Some(splitTuner))
     val method = PrivateMethod[Try[Pipeline]]('generateModel)
@@ -45,6 +45,5 @@ class CaraModelTest extends TestBase {
     splitModel.get.getStages.length shouldBe 1
     splitModel.get.getStages.head.isInstanceOf[TrainValidationSplit] shouldBe true
     splitModel.get.getStages.head.asInstanceOf[TrainValidationSplit].getTrainRatio shouldBe 0.6
-
   }
 }
