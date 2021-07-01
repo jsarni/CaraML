@@ -50,12 +50,11 @@ class LogisticRegressionTest extends TestBase {
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
 
-//    Test default values of unset params
     lrWithTwoParams.getMaxIter shouldBe 100
     lrWithTwoParams.getFamily shouldBe "auto"
     lrWithTwoParams.getTol shouldBe 0.000001
-
   }
+
   "GetMethode" should "Return the appropriate methode by it's name" in {
     val params = Map(
       "MaxIter" -> "10",
@@ -78,7 +77,6 @@ class LogisticRegressionTest extends TestBase {
     caraLr.getMethode(model,10,"MaxIter").getName shouldBe "setMaxIter"
     caraLr.getMethode(model,0.0,"RegParam").getName shouldBe "setRegParam"
     caraLr.getMethode(model, false ,"Standardization").getName shouldBe "setStandardization"
-
   }
 }
 

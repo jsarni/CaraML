@@ -41,11 +41,10 @@ class NaiveBayesTest extends TestBase {
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
 
-    //    Test default values of unset params
     NBayesWithTwoParams.getSmoothing shouldBe 1.0
     NBayesWithTwoParams.getModelType shouldBe "multinomial"
-
   }
+
   "GetMethode" should "Return the appropriate methode by it's name" in {
     val params = Map(
       "FeaturesCol" -> "FeaturesCol",
@@ -64,6 +63,5 @@ class NaiveBayesTest extends TestBase {
     caraNaivebayes.getMethode(model,"String","FeaturesCol").getName shouldBe "setFeaturesCol"
     caraNaivebayes.getMethode(model,0.0,"Smoothing").getName shouldBe "setSmoothing"
     caraNaivebayes.getMethode(model, Array(1.0,0.2) ,"Thresholds").getName shouldBe "setThresholds"
-
   }
 }

@@ -44,12 +44,11 @@ class LDATest extends TestBase {
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
 
-    //    Test default values of unset params
     LDAWithTwoParams.getMaxIter shouldBe 20
     LDAWithTwoParams.getK shouldBe 10
     LDAWithTwoParams.getSubsamplingRate shouldBe 0.05
-
   }
+
   "GetMethode" should "Return the appropriate methode by it's name" in {
     val params = Map(
       "CheckpointInterval" -> "3",
@@ -69,8 +68,6 @@ class LDATest extends TestBase {
     caraLDA.getMethode(model,10,"MaxIter").getName shouldBe "setMaxIter"
     caraLDA.getMethode(model,2,"K").getName shouldBe "setK"
     caraLDA.getMethode(model, "gamma" ,"TopicDistributionCol").getName shouldBe "setTopicDistributionCol"
-
   }
-
 
 }

@@ -60,7 +60,6 @@ class GBTRegressorTest extends TestBase {
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
 
-    //    Test default values of unset params
     gbtWithTwoParams.getMinInstancesPerNode shouldBe 1
     gbtWithTwoParams.getLossType shouldBe "squared"
     gbtWithTwoParams.getStepSize shouldBe 0.1
@@ -93,7 +92,6 @@ class GBTRegressorTest extends TestBase {
     caraLr.getMethode(model,10.toLong,"Seed").getName shouldBe "setSeed"
     caraLr.getMethode(model,"PredictCol","PredictionCol").getName shouldBe "setPredictionCol"
     caraLr.getMethode(model, 10 ,"CheckpointInterval").getName shouldBe "setCheckpointInterval"
-
   }
 
 }

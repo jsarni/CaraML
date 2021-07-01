@@ -56,7 +56,6 @@ class DecisionTreeRegressorTest extends TestBase {
 
     resContain should contain theSameElementsAs expectedContain
 
-    //    Test default values of unset params
     dTreeWithTwoParams.getImpurity shouldBe "variance"
     dTreeWithTwoParams.getMaxBins shouldBe 32
     dTreeWithTwoParams.getMinInfoGain shouldBe 0.0
@@ -85,7 +84,6 @@ class DecisionTreeRegressorTest extends TestBase {
     caraLr.getMethode(model,10.toLong,"Seed").getName shouldBe "setSeed"
     caraLr.getMethode(model,"PredictCol","PredictionCol").getName shouldBe "setPredictionCol"
     caraLr.getMethode(model, 10 ,"CheckpointInterval").getName shouldBe "setCheckpointInterval"
-
   }
 
 }

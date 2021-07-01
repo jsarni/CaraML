@@ -40,11 +40,10 @@ class KMeansTest extends TestBase {
 
     resParameters.head should contain theSameElementsAs expectedParameters.head
 
-    //    Test default values of unset params
     KmeansWithTwoParams.getMaxIter shouldBe 20
     KmeansWithTwoParams.getK shouldBe 2
-
   }
+
   "GetMethode" should "Return the appropriate methode by it's name" in {
     val params = Map(
       "DistanceMeasure" -> "euclidean",
@@ -62,8 +61,6 @@ class KMeansTest extends TestBase {
     caraKmeans.getMethode(model,10,"MaxIter").getName shouldBe "setMaxIter"
     caraKmeans.getMethode(model,2,"K").getName shouldBe "setK"
     caraKmeans.getMethode(model, "euclidean" ,"DistanceMeasure").getName shouldBe "setDistanceMeasure"
-
   }
-
 
 }

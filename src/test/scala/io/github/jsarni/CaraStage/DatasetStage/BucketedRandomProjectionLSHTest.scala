@@ -1,21 +1,21 @@
 package io.github.jsarni.CaraStage.DatasetStage
-import org.apache.spark.ml.feature.{BucketedRandomProjectionLSH => fromSparkML}
-
-import scala.util.Try
 
 import io.github.jsarni.TestBase
+import org.apache.spark.ml.feature.{BucketedRandomProjectionLSH => fromSparkML}
 
 class BucketedRandomProjectionLSHTest extends TestBase {
 
-"BucketedRandomProjectionLSH build Success" should
-  "Build BucketedRandomProjectionLSH with the parametres given and be the same of Spark ML BucketedRandomProjectionLSH" in {
+  "BucketedRandomProjectionLSH build Success" should
+    "Build BucketedRandomProjectionLSH with the parametres given and be the same of Spark ML BucketedRandomProjectionLSH" in {
 
     val CaraDsFeature = new BucketedRandomProjectionLSH(
-      Map("BucketLength"-> "10.0",
-      "InputCol"->"Col_Input",
-      "NumHashTables"-> "5",
-      "OutputCol"-> "Col_Output",
-      "Seed"-> "10")
+      Map(
+        "BucketLength" -> "10.0",
+        "InputCol" -> "Col_Input",
+        "NumHashTables" -> "5",
+        "OutputCol" -> "Col_Output",
+        "Seed" -> "10"
+      )
     )
 
     val SparkFeature=new fromSparkML()
@@ -34,11 +34,13 @@ class BucketedRandomProjectionLSHTest extends TestBase {
   "BucketedRandomProjectionLSHTest build Failure" should "Throw NumberFormatException " in {
 
     an [NumberFormatException] should be thrownBy BucketedRandomProjectionLSH(
-      Map("BucketLength"-> "10.0",
-        "InputCol"->"Col_Input",
-        "NumHashTables"-> "wrong_value",
-        "OutputCol"-> "Col_Output",
-        "Seed"-> "10")
+      Map(
+        "BucketLength" -> "10.0",
+        "InputCol" -> "Col_Input",
+        "NumHashTables" -> "wrong_value",
+        "OutputCol" -> "Col_Output",
+        "Seed" -> "10"
+      )
     )
   }
 }

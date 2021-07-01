@@ -3,9 +3,8 @@ package io.github.jsarni.CaraStage.ModelStage
 import io.github.jsarni.TestBase
 import org.apache.spark.ml.classification.{RandomForestClassifier => SparkML}
 
-import scala.util.Try
-
 class RandomForestClassifierTest extends TestBase {
+
   "build" should "Create an lr model and set all parameters with there args values or set default ones" in {
     val params = Map(
       "CheckpointInterval" -> "10",
@@ -54,27 +53,27 @@ class RandomForestClassifierTest extends TestBase {
         .setFeatureSubsetStrategy("auto")
         .setSubsamplingRate(0.5)
         .setNumTrees(12)
-
     )
     rdForest.build().isSuccess shouldBe true
 
     val res = List(rdForest.build().get)
-    val resParameters = res.map(_.extractParamMap().toSeq.map(_.value))
-      .map(_.map(elem =>
-        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
-        else List(elem)))
-      .flatten
-      .flatten
-    val expectedParameters = expectedResult.map(_.extractParamMap().toSeq.map(_.value))
-      .map(_.map(elem =>
-        if (elem.isInstanceOf[Array[_]]) elem.asInstanceOf[Array[_]].toList
-        else List(elem)))
-      .flatten
-      .flatten
+    val resParameters =
+      res.flatMap { elem =>
+        val values = elem.extractParamMap().toSeq.map(_.value)
+        values.flatMap { value =>
+          if (value.isInstanceOf[Array[_]]) value.asInstanceOf[Array[_]].toList else List(value)
+        }
+      }
+
+    val expectedParameters = expectedResult.flatMap { elem =>
+      val values = elem.extractParamMap().toSeq.map(_.value)
+      values.flatMap { value =>
+        if (value.isInstanceOf[Array[_]]) value.asInstanceOf[Array[_]].toList else List(value)
+      }
+    }
 
     resParameters should contain theSameElementsAs expectedParameters
 
-    //    Test default values of unset params
     rdForestWithTwoParams.getImpurity shouldBe "gini"
     rdForestWithTwoParams.getMaxBins shouldBe 32
     rdForestWithTwoParams.getNumTrees shouldBe 20
