@@ -1,7 +1,7 @@
 package io.github.jsarni
 
-import io.github.jsarni.CaraYaml.CaraYamlReader
-import io.github.jsarni.PipelineParser.{CaraParser, CaraPipeline}
+import io.github.jsarni.carayaml.CaraYamlReader
+import io.github.jsarni.pipelineparser.{CaraParser, CaraPipeline}
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql.Dataset
