@@ -1,22 +1,21 @@
 package io.github.jsarni
+import java.io.File
+
 import io.github.jsarni.CaraStage.DatasetStage._
-import io.github.jsarni.CaraStage.ModelStage.{KMeans, LogisticRegression}
+import io.github.jsarni.CaraStage.ModelStage.{ LogisticRegression}
 import io.github.jsarni.CaraStage.TuningStage.TuningStageDescription
 import io.github.jsarni.PipelineParser.CaraPipeline
-import org.apache.avro.generic.GenericData.StringType
-import org.apache.spark.ml.{Pipeline, classification, clustering, feature}
+import org.apache.spark.ml.{Pipeline}
 import org.apache.spark.ml.evaluation.{BinaryClassificationEvaluator, RegressionEvaluator}
 import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.tuning.{CrossValidator, TrainValidationSplit}
-import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 
 import scala.util.Try
-import org.apache.spark.ml.clustering.{KMeans, LDA}
 
 class CaraModelTest extends TestBase {
+
   "generateModel" should "Return validation model with the right method and params" in {
     val lr = new LinearRegression()
       .setMaxIter(10)
@@ -55,46 +54,44 @@ class CaraModelTest extends TestBase {
   }
 "generateReport" should "return the Pipeline metrics" in {
 
-  implicit val spark: SparkSession =
-    SparkSession.builder()
-      .appName("CaraML")
-      .master("local[1]")
-      .getOrCreate()
+    implicit val spark: SparkSession =
+      SparkSession.builder()
+        .appName("CaraML")
+        .master("local[1]")
+        .getOrCreate()
 
-  val Data = spark.createDataFrame(Seq(
-    (0.0, 0.21, 0.66),
-    (0.0, 0.38, 0.78),
-    (1.0, 0.55, 0.25),
-    (1.0, 0.70, 0.10),
-    (1.0, 0.91, 0.06),
-    (0.0, 0.27, 0.70)
-  )).toDF("labels", "values1","values2")
+    val Data = spark.createDataFrame(
+      Seq(
+        (0.0, 0.21, 0.66),
+        (0.0, 0.38, 0.78),
+        (1.0, 0.55, 0.25),
+        (1.0, 0.70, 0.10),
+        (1.0, 0.91, 0.06),
+        (0.0, 0.27, 0.70)
+      )
+    ).toDF("labels", "values1","values2")
 
-  val cols = Array( "values1","values2")
-  val assembler = new VectorAssembler()
-    .setInputCols(cols)
-    .setOutputCol("features")
-  val featuresDf = assembler.transform(Data)
+    val cols = Array( "values1","values2")
+    val assembler = new VectorAssembler()
+                        .setInputCols(cols)
+                        .setOutputCol("features")
 
-  val indexer = new StringIndexer()
-    .setInputCol("labels")
-    .setOutputCol("label")
-  val labelsDf = indexer.fit(featuresDf).transform(featuresDf)
-  //labelsDf.show()
+    val indexer = new StringIndexer()
+                      .setInputCol("labels")
+                      .setOutputCol("label")
 
-  val logi = LogisticRegression(Map("MaxIter"->"10")).build().get
+    val logi = LogisticRegression(Map("MaxIter"->"10")).build().get
 
+    val caraModel = new CaraModel("YamlPath", Data, "/")(spark)
+    val pipeline = new Pipeline()
+      .setStages(Array(assembler,indexer,logi))
 
-  val caraModel = new CaraModel("YamlPath", Data, "/home/aghylassai/Bureau/PA/")(spark)
-  val pipeline = new Pipeline()
-    .setStages(Array(assembler,indexer,logi))
+    val method = PrivateMethod[Try[Unit]]('generateReport)
+    val fitedPipeline = pipeline.fit(Data)
 
+    val reportModel = caraModel.invokePrivate(method(fitedPipeline))
+    val eval = fitedPipeline
+    reportModel.isSuccess shouldBe true
 
-
-  val method = PrivateMethod[Try[Unit]]('generateReport)
-  val fited=pipeline.fit(Data)
-  val crossModels = caraModel.invokePrivate(method(fited)).get
-
-
-}
+  }
 }

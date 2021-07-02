@@ -1,3 +1,3 @@
-<div id="Stage Name/ Model Name Gray" style="width: 500px;" class="shadow p-1 mb-1 bg-body">
+<div id="Stage Name/ Model Name Gray" style="width: 1000px; margin: 0 auto;" class="shadow p-1 mb-1 bg-body">
         <div class=" p-3 mb-2 bg-secondary text-white" >
-          <p style="color: #FFFFFF; height: 10px ; "class="text-center"> <!--Block1 END-->
+          <p style="color: #FFFFFF; height: 10px ; "class="text-center"><b> <!--Block1 END-->

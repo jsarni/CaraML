@@ -6,24 +6,17 @@ import io.github.jsarni.CaraYaml.CaraYamlReader
 import io.github.jsarni.PipelineParser.{CaraParser, CaraPipeline}
 import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, GBTClassificationModel, LogisticRegressionModel, NaiveBayes, NaiveBayesModel, RandomForestClassificationModel}
 import org.apache.spark.mllib.clustering.{KMeansModel, LDAModel}
-import org.apache.spark.ml.regression.LinearRegressionModel
-import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer, classification}
+import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, GBTRegressionModel, LinearRegressionModel, RandomForestRegressionModel}
+import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer}
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 
-import scala.util.Try
-import scala.util.control.Breaks._
+import scala.util.{Success, Try}
 import java.io._
-import java.nio._
 import java.nio.file.{Files, Paths}
 import java.sql.Timestamp
 import java.time.Instant
-import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
-
-
-import org.apache.spark.ml.clustering.KMeans
-
 import scala.collection.mutable
 
 final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(implicit spark: SparkSession) {
@@ -35,78 +28,108 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
     caraPipeline <- parser.build()
     sparkPipeline <- generateModel(caraPipeline)
     fittedModel <- train(sparkPipeline, dataset)
-//    _ <- generateReport(fittedModel)
+    _ <- generateReport(fittedModel)
     _ <- save(fittedModel)
   } yield ()
 
+  private def evaluateReport(filename: String, model : PipelineModel, dataset: Dataset[_]): String = {
+    // Get 10 first Values to show
+    val eval = model.transform(dataset).limit(10)
 
-  def writeHTMLFile(filename: String, ArrayStages: Array[mutable.SortedMap[String,Any]]): Unit = {
+    // Prepare the Html Table Skeleton
+    val bluePart   = "<div id=\"Models and Metrics BLUE\" class=\" p-3 mb-2 bg-info text-white\">\n<p style=\"color: #FFFFFF; font-size: 25px;\"class=\"text-center\">Model Evaluation </p>\n</div>\n"
+    val columnPart = "<table  class =\"table table-striped table-dark \" style=\" width: 1000px; margin: 0 auto;\">\n<thead class=\"thead-blue\" >\n<tr style=\"height: 18px;\">\n<th scope=\"col\"> </th>"
+    val partOne    = "<th scope= \"col \" class= \"text-center \" style= \" font-size: 25px;\">"
+    val partTwo    = "<td class=\" text-center \">"
 
-    //Save the Logo Img to the directory
-    val logoIMG  = new File(filename + s"/caraML_logo_200x100.png")
-    val logoRead = ImageIO.read(new File("src/main/resources/caraML_logo_200x100.png"))
-    ImageIO.write(logoRead, "png", logoIMG)
+    val hearderPart : String    = s"$bluePart$columnPart"
+    val columnList : String     = eval.columns.map( col => s"$partOne ${col.capitalize} </th>\n" ).mkString
+    val valuesPart : String     =  eval.collect().map { row =>
+                                                             List("<tr style=\"height: 18px;\">\n <th scope=\"row\"class=\"text-center\"></th>\n".mkString,
+                                                             row.toSeq.map( field => s"$partTwo $field </td>\n").mkString,
+                                                             "</tr>\n").mkString
+                                                      }.mkString
 
-    //Create the file
-    val rapportDate: String= Timestamp.from(Instant.now()).toString.replace(" ","-")
-    val fileHTML = new File(filename + s"/ModelMetrics_$rapportDate.html")
-    val fileBufferWriter = new BufferedWriter(new FileWriter(fileHTML))
+    val finalSkeleton : String  = s"$hearderPart $columnList </tr>\n</thead>\n<tbody>\n$valuesPart </tbody>\n </table> \n <p> <br>  </p>\n </body> \n </html>"
 
-    // Load HTML Component
-    val headHTML = new String(Files.readAllBytes(Paths.get("src/main/resources/header.txt")))
-    val bodyPartOne = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part1.txt")))
-    val bodyPartTwo = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part2.txt")))
-
-    val firstPart ="<tr style=\"height: 18px;\">\n <th scope=\"row\"></th>\n <td>"
-    val secondPart = "</td>\n<td>"
-
-    // Write HTML Skeleton
-    fileBufferWriter.write(headHTML)
-
-      for (lines <- ArrayStages) {
-
-        // Inject Model Metrics
-        val modelName = lines.map(line => if (line._1 == "Model Name") line._2 else new String(""))
-          .toList
-          .filter(p => p.asInstanceOf[String].length > 0)
-          .mkString
-
-        // If the Stage dont have Metrics : print only the Stage Name
-        if (modelName.endsWith("display")) {
-          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div>\n")
-
-        }
-        else{
-
-          fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div> \n" + bodyPartTwo)
-
-          for ((field, value) <- lines) {
-
-            fileBufferWriter.write(s"$firstPart $field $secondPart $value </td> </tr> \n")
-        }
-          fileBufferWriter.write("</tbody>\n </table>\n </div>\n")
-        }
-      }
-    fileBufferWriter.write("</body>\n</html>")
-    fileBufferWriter.close()
-  }
-
-  private def generateReport(model: PipelineModel) : Try[Unit] = Try{
-
-    val StageMetrics = model.stages.map(stage => getStageMetrics(stage).get )
-    writeHTMLFile(savePath ,StageMetrics)
+    finalSkeleton
 
   }
+
+  private def writeHTMLFile(filename: String, ArrayStages: Array[mutable.SortedMap[String,Any]], evalModel : PipelineModel): Unit = {
+
+    // Set Paths and File Name
+    val rapportDate: String= Timestamp.from(Instant.now())
+                                      .toString
+                                      .replace(" ","-")
+
+    val reportDirectory = new File(filename+ rapportDate)
+    val reportSucces = reportDirectory.mkdirs()
+
+    if (reportSucces == true) {
+
+      //Save the Logo Img to the directory
+      val logoIMG  = new File(reportDirectory + s"/caraML_logo_200x100.png")
+      val logoRead = ImageIO.read(new File("src/main/resources/caraML_logo_200x100.png"))
+      ImageIO.write(logoRead, "png", logoIMG)
+
+      //Create the HTML file
+      val fileHTML = new File(reportDirectory + s"/ModelMetrics_$rapportDate.html")
+      val fileBufferWriter = new BufferedWriter(new FileWriter(fileHTML))
+
+      // Load HTML Component from existing Resources
+      val headHTML = new String(Files.readAllBytes(Paths.get("src/main/resources/header.txt")))
+      val bodyPartOne = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part1.txt")))
+      val bodyPartTwo = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part2.txt")))
+
+      val firstPart ="<tr style=\"height: 18px;\">\n <th scope=\"row\"></th>\n <td class=\"text-center\">"
+      val secondPart = "</td>\n<td class=\"text-center\">"
+
+      // Write HTML Skeleton
+      fileBufferWriter.write(headHTML)
+
+        for (lines <- ArrayStages) {
+
+          // Get the Model Name
+          val modelName = lines.map(line => if (line._1 == "Model Name") line._2 else new String(""))
+            .toList
+            .filter(p => p.asInstanceOf[String].length > 0)
+            .mkString
+
+          // If the Stage doesn't have Metrics : print only the Stage Name
+          if (modelName.endsWith("display")) {
+            fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div>\n")
+
+          }
+          else {
+            // Inject Model Metrics
+            fileBufferWriter.write(bodyPartOne + s"$modelName </p> </div> </div> \n" + bodyPartTwo)
+            for ((field, value) <- lines) {
+
+              fileBufferWriter.write(s"$firstPart $field $secondPart $value </td> </tr> \n")
+            }
+
+            fileBufferWriter.write("</tbody>\n </table>\n </div>\n <p> <br>  </p>\n")
+          }
+        }
+
+      //Write the Evaluate Model Results
+      val evaluationResults : String = evaluateReport(filename,evalModel,dataset)
+      fileBufferWriter.write(evaluationResults)
+
+      fileBufferWriter.close()
+   }
+  }
+
   private def getStageMetrics(stage: Transformer) : Try[mutable.SortedMap[String,Any]] =Try {
 
-    val stagesModel=stage
     val rapportDate: String= Timestamp.from(Instant.now()).toString.replace(" ","-")
+    val modelName : String= stage.getClass.getName.split('.').last.replace("Model","")
 
-    stagesModel match {
-
+    stage match {
+        // Classification Models
       case m: DecisionTreeClassificationModel => {
 
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Raport Date Generation"        -> rapportDate,
@@ -116,11 +139,80 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
         )
 
       }
+      case m: GBTClassificationModel   => {
+
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Raport Date Generation"        -> rapportDate,
+          "Feature Importances"           -> m.featureImportances.toArray.toList.mkString,
+          "Number of Features"            -> m.numFeatures,
+          "Features Column"               -> m.featuresCol.name,
+          "Number of Trees"               -> m.getNumTrees
+        )
+
+
+      }
+
+      case m:RandomForestClassificationModel => {
+
+        val summ = m.summary
+
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "Accuracy"                      -> summ.accuracy,
+          "Weighted True Positive Rate"   -> summ.weightedTruePositiveRate,
+          "Total Iterations"              -> summ.totalIterations,
+          "Objective History"             -> summ.objectiveHistory.toList.mkString,
+          "Recall By Label"               -> summ.recallByLabel.toList.mkString,
+          "Weighted Recall"               -> summ.weightedRecall,
+          "Precision By Label"            -> summ.precisionByLabel.toList.mkString,
+          "Labels"                        -> summ.labels.toList.mkString,
+          "Label Column"                  -> summ.labelCol,
+          "Prediction Column"             -> summ.predictionCol,
+          "False Positive Rate By Label"  -> summ.falsePositiveRateByLabel.toList.mkString,
+          "Weight Column"                 -> summ.weightCol,
+          "FMeasure By Label"             -> summ.fMeasureByLabel.toList.mkString,
+          "Weighted FMeasure"             -> summ.weightedFMeasure,
+          "Weighted Precision"            -> summ.weightedPrecision
+        )
+      }
+        //Regression Models
+      case m : DecisionTreeRegressionModel => {
+
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "Feature Importances"           -> m.featureImportances.toArray.mkString("\n"),
+          "Features Number"               -> m.numFeatures,
+          "Features Columns"              -> m.featuresCol.name
+        )
+      }
+
+      case m : RandomForestRegressionModel => {
+
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "Features Column"               -> m.featuresCol,
+          "Feature Importances"           -> m.featureImportances.toArray.mkString("\n"),
+          "Features Number"               -> m.numFeatures
+        )
+      }
+      case m : GBTRegressionModel => {
+        mutable.SortedMap(
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "Features Column"               -> m.featuresCol,
+          "Feature Importances"           -> m.featureImportances.toArray.mkString("\n"),
+          "Features Number"               -> m.numFeatures
+        )
+
+      }
 
       case m: LogisticRegressionModel => {
 
         val summ=m.summary
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Report Date Generation"        -> rapportDate,
@@ -149,7 +241,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
       case m: LinearRegressionModel   => {
 
         val summ = m.summary
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Report Date Generation"        -> rapportDate,
@@ -173,59 +264,19 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
         )
 
       }
+      //Clustering Models
+      case m: KMeansModel => {
 
-      case m: GBTClassificationModel   => {
-
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        mutable.SortedMap(
-          "Model Name"                    -> modelName,
-          "Raport Date Generation"        -> rapportDate,
-          "Feature Importances"           -> m.featureImportances.toArray.toList.mkString,
-          "Number of Features"            -> m.numFeatures,
-          "Features Column"               -> m.featuresCol.name,
-          "Number of Trees"               -> m.getNumTrees
-        )
-
-
-      }
-
-      case m:RandomForestClassificationModel => {
-
-        val summ = m.summary
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
-          "Accuracy"                      -> summ.accuracy,
-          "Weighted True Positive Rate"   -> summ.weightedTruePositiveRate,
-          "Total Iterations"              -> summ.totalIterations,
-          "Objective History"             -> summ.objectiveHistory.toList.mkString,
-          "Recall By Label"               -> summ.recallByLabel.toList.mkString,
-          "Weighted Recall"               -> summ.weightedRecall,
-          "Precision By Label"            -> summ.precisionByLabel.toList.mkString,
-          "Labels"                        -> summ.labels.toList.mkString,
-          "Label Column"                  -> summ.labelCol,
-          "Prediction Column"             -> summ.predictionCol,
-          "False Positive Rate By Label"  -> summ.falsePositiveRateByLabel.toList.mkString,
-          "Weight Column"                 -> summ.weightCol,
-          "FMeasure By Label"             -> summ.fMeasureByLabel.toList.mkString,
-          "Weighted FMeasure"             -> summ.weightedFMeasure,
-          "Weighted Precision"            -> summ.weightedPrecision
+          "Cluster Centers"               -> m.clusterCenters,
+          "Distance Measure"              -> m.distanceMeasure
         )
-      }
-
-      case m: KMeansModel => {
-        val km= m.asInstanceOf[KMeansModel]
-
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
-        mutable.SortedMap(
-          "Model Name"                    -> modelName,
-          "Report Date Generation"        -> rapportDate)
 
       }
       case m : LDAModel  => {
-        val summ = m
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+
         mutable.SortedMap(
         "Model Name"                    -> modelName,
         "Report Date Generation"        -> rapportDate,
@@ -235,8 +286,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
       }
       case m : NaiveBayesModel => {
 
-        val summ = m
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
@@ -245,11 +294,19 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
           "Theta"                         -> m.theta.toArray.toList.mkString)
 
       }
+      //Default
       case m => {
-        val modelName : String= m.getClass.getName.split('.').last.replace("Model","")
+
         mutable.SortedMap("Model Name" -> s"$modelName : This Stage has no Metrics to display")
       }
     }
+  }
+
+  private def generateReport(model: PipelineModel) : Try[Unit] = Try{
+
+    val StageMetrics = model.stages.map(stage => getStageMetrics(stage).get )
+    writeHTMLFile(savePath ,StageMetrics,model)
+
   }
 
   def evaluate(dataset: Dataset[_]): Dataset[_] = {
@@ -300,6 +357,4 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
   private def save(model: PipelineModel) : Try[Unit] = Try {
     model.write.save(savePath)
   }
-
-
 }
