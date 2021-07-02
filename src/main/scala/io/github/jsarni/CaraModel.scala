@@ -129,7 +129,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
     stage match {
         // Classification Models
       case m: DecisionTreeClassificationModel => {
-
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
                               "Raport Date Generation"        -> rapportDate,
@@ -137,10 +136,9 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
                               "Number of Features"            -> m.numFeatures,
                               "features Column"               -> m.featuresCol.name
         )
-
       }
-      case m: GBTClassificationModel   => {
 
+      case m: GBTClassificationModel   => {
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Raport Date Generation"        -> rapportDate,
@@ -149,14 +147,10 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
           "Features Column"               -> m.featuresCol.name,
           "Number of Trees"               -> m.getNumTrees
         )
-
-
       }
 
       case m:RandomForestClassificationModel => {
-
         val summ = m.summary
-
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
@@ -179,7 +173,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
       }
         //Regression Models
       case m : DecisionTreeRegressionModel => {
-
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
@@ -190,7 +183,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
       }
 
       case m : RandomForestRegressionModel => {
-
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
@@ -199,6 +191,7 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
           "Features Number"               -> m.numFeatures
         )
       }
+
       case m : GBTRegressionModel => {
         mutable.SortedMap(
           "Model Name"                    -> modelName,
@@ -207,11 +200,9 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
           "Feature Importances"           -> m.featureImportances.toArray.mkString("\n"),
           "Features Number"               -> m.numFeatures
         )
-
       }
 
       case m: LogisticRegressionModel => {
-
         val summ=m.summary
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
@@ -235,11 +226,9 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
                               "Weighted False Positive Rate"  -> summ.weightedFalsePositiveRate,
                               "Weighted FMeasure"             -> summ.weightedFMeasure
         )
-
       }
 
       case m: LinearRegressionModel   => {
-
         val summ = m.summary
         mutable.SortedMap(
                               "Model Name"                    -> modelName,
@@ -262,41 +251,37 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
                               "Root Mean Squared Error"       -> summ.rootMeanSquaredError,
                               "TValues"                       -> summ.tValues.toList.mkString
         )
-
       }
+
       //Clustering Models
       case m: KMeansModel => {
-
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
           "Cluster Centers"               -> m.clusterCenters,
           "Distance Measure"              -> m.distanceMeasure
         )
-
       }
+
       case m : LDAModel  => {
-
         mutable.SortedMap(
-        "Model Name"                    -> modelName,
-        "Report Date Generation"        -> rapportDate,
-        "k"                             ->  m.k,
+          "Model Name"                    -> modelName,
+          "Report Date Generation"        -> rapportDate,
+          "k"                             ->  m.k
         )
-
       }
-      case m : NaiveBayesModel => {
 
+      case m : NaiveBayesModel => {
         mutable.SortedMap(
           "Model Name"                    -> modelName,
           "Report Date Generation"        -> rapportDate,
           "Pi"                            -> m.pi.toArray.toList.mkString,
           "Sigma"                         -> m.sigma.toArray.toList.mkString,
-          "Theta"                         -> m.theta.toArray.toList.mkString)
-
+          "Theta"                         -> m.theta.toArray.toList.mkString
+        )
       }
       //Default
       case m => {
-
         mutable.SortedMap("Model Name" -> s"$modelName : This Stage has no Metrics to display")
       }
     }
@@ -306,7 +291,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String)(i
 
     val StageMetrics = model.stages.map(stage => getStageMetrics(stage).get )
     writeHTMLFile(savePath ,StageMetrics,model)
-
   }
 
   def evaluate(dataset: Dataset[_]): Dataset[_] = {
