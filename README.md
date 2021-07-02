@@ -175,7 +175,7 @@ This section lists all available SparkML components that you can use with CaraML
 
 
 ## *CamaML schema*
-![alt text](https://github.com/jsarni/CaraML/blob/feature/readme_documentation/PA.PNG?raw=true)
+![alt text](PA.PNG?raw=true)
 
 
 ## *Example*
