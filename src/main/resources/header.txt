@@ -15,7 +15,7 @@
   <body>
 
     <figure class="figure">
-      <img src="./caraML_logo_200x100.png" class="figure-img img-fluid rounded">
+      <p>     </p>
     </figure>
 
     <div style="font-family: Lucida Sans Unicode, Lucida Grande, sans-serif; color: #5e9ca0;">

@@ -11,6 +11,7 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 
 import scala.collection.mutable
 import scala.util.Try
+import scala.io.Source
 import scala.util.{Success, Try}
 import java.io._
 import java.nio.file.{Files, Paths}
@@ -71,18 +72,21 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, o
     }
 
       //Save the Logo Img to the directory
-      val logoIMG  = new File(reportDirectory + s"/caraML_logo_200x100.png")
-      val logoRead = ImageIO.read(new File("src/main/resources/caraML_logo_200x100.png"))
-      ImageIO.write(logoRead, "png", logoIMG)
+//      val logoIMG  = new File(reportDirectory + s"/caraML_logo_200x100.png")
+//    val s = Source.fromResource("caraML_logo_200x100.png")
+//    println(s"This is the Image content : $s")
+//
+//      val logoRead = ImageIO.read( new File(getClass.getResource("caraML_logo_200x100.png").getPath))
+//      ImageIO.write(logoRead, "png", logoIMG)
 
       //Create the HTML file
       val fileHTML = new File(reportDirectory + s"/ModelMetrics.html")
       val fileBufferWriter = new BufferedWriter(new FileWriter(fileHTML))
 
       // Load HTML Component from existing Resources
-      val headHTML = new String(Files.readAllBytes(Paths.get("src/main/resources/header.txt")))
-      val bodyPartOne = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part1.txt")))
-      val bodyPartTwo = new String(Files.readAllBytes(Paths.get("src/main/resources/body_part2.txt")))
+      val headHTML = Source.fromResource("header.txt").mkString
+      val bodyPartOne = Source.fromResource("body_part1.txt").mkString
+      val bodyPartTwo = Source.fromResource("body_part2.txt").mkString
 
       val firstPart ="<tr style=\"height: 18px;\">\n <th scope=\"row\"></th>\n <td class=\"text-center\">"
       val secondPart = "</td>\n<td class=\"text-center\">"

@@ -85,9 +85,14 @@ class CaraModelTest extends TestBase {
     val method = PrivateMethod[Try[Unit]]('generateReport)
     val fitedPipeline = pipeline.fit(Data)
 
-    val caraModel = new CaraModel("yaml_path", Data, "/model.cml")
-    val reportModel = caraModel. invokePrivate(method(fitedPipeline))
-    reportModel.isSuccess shouldBe true
+
+    val ds1 = assembler.transform(Data)
+    val dsFinal= indexer.fit(ds1).transform(ds1)
+    val caraModel = new CaraModel("/home/aghylassai/Bureau/test_PA/test_file.yaml", dsFinal, "/home/aghylassai/Bureau/test_PA/model.cml")
+    caraModel.run()
+
+//    val reportModel = caraModel. invokePrivate(method(fitedPipeline))
+//    reportModel.isSuccess shouldBe true
   }
 
 
