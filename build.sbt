@@ -2,7 +2,7 @@ scalaVersion := "2.12.13"
 
 name := "CaraML"
 
-version := "1.0.0-SNAPSHOT"
+version := "1.0.0"
 
 organization := "io.github.jsarni"
 homepage := Some(url("https://github.com/jsarni/CaraML"))
