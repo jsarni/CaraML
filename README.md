@@ -1,4 +1,4 @@
-# CaraMLgi
+# CaraML
 
 ## *Presentation*
 
