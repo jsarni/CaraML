@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+
+  <head>
+
+    <title>CaraML Report</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  </head>
+
+  <body>
+
+    <figure class="figure">
+      <p>     </p>
+    </figure>
+
+    <div style="font-family: Lucida Sans Unicode, Lucida Grande, sans-serif; color: #5e9ca0;">
+      <div class="shadow-sm p-1 mb-5 bg-white rounded">
+        <h1 >CaraML : Pipeline Metrics Report</h1>
+      </div>
+    </div>
+
+    <p class="text-center shadow-sm p-1 mb-1 bg-white rounded" >This is the Fit report of your PipelineModel&nbsp; &nbsp;&nbsp;</p>
+
+    <h2 class="text-center shadow-sm p-1 mb-1 bg-white rounded" style="color: #2e6c80;">Summary</h2>
+
+      <div id="Models and Metrics BLUE" class=" p-3 mb-2 bg-info text-white"  >
+        <p style="color: #FFFFFF; font-size: 25px;"class="text-center">Models and Metrics </p>
+      </div>
+      <!-- BEGIN 1ST LOOP FROM HERE -->
+      <!--Block1 BEGIN-->
