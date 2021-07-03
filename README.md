@@ -13,7 +13,7 @@ To use CaraML framework, you must satisfy the following requirements:
 - Scala version >= 2.12.13
 - Spark version >= 3.1
 - Java 11
-- CaraML library
+
 
 
 ## *Installation* 
