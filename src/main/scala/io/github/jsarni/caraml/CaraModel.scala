@@ -7,18 +7,18 @@ import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, GBTC
 import org.apache.spark.mllib.clustering.{KMeansModel, LDAModel}
 import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, GBTRegressionModel, LinearRegressionModel, RandomForestRegressionModel}
 import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer}
-import org.apache.spark.sql.{Dataset, SparkSession}
 
 import scala.collection.mutable
 import scala.util.Try
 import scala.io.Source
 import scala.util.{Success, Try}
 import java.io._
-import java.nio.file.{Files, Paths}
+
 import java.sql.Timestamp
 import java.time.Instant
 
-import javax.imageio.ImageIO
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.functions.{array, col, mean, when}
 
 import scala.collection.mutable
 
@@ -36,24 +36,29 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, o
     _ <- save(fittedModel)
   } yield ()
 
+  def computeAccuracy(prediction: Dataset[_]): DataFrame = {
+    prediction.withColumn("is_success", when(col("label") === col("prediction"), 1).otherwise(0))
+      .agg(mean("is_success").as("train_dataset_accuracy"))
+  }
   private def evaluateReport(model : PipelineModel, dataset: Dataset[_]): String = {
+
     // Get 10 first Values to show
-    val eval = model.transform(dataset).limit(10)
+    val evals = computeAccuracy(model.transform(dataset))
 
     // Prepare the Html Table Skeleton
     val bluePart   = "<div id=\"Models and Metrics BLUE\" class=\" p-3 mb-2 bg-info text-white\">\n<p style=\"color: #FFFFFF; font-size: 25px;\"class=\"text-center\">Model Evaluation </p>\n</div>\n"
     val columnPart = "<table  class =\"table table-striped table-dark \" style=\" width: 1000px; margin: 0 auto;\">\n<thead class=\"thead-blue\" >\n<tr style=\"height: 18px;\">\n<th scope=\"col\"> </th>"
     val partOne    = "<th scope= \"col \" class= \"text-center \" style= \" font-size: 25px;\">"
     val partTwo    = "<td class=\" text-center \">"
-
+    // Inject Results to Html
     val hearderPart : String    = s"$bluePart$columnPart"
-    val columnList : String     = eval.columns.map( col => s"$partOne ${col.capitalize} </th>\n" ).mkString
-    val valuesPart : String     =  eval.collect().map { row =>
+    val columnList : String     = evals.columns.map( col => s"$partOne ${col.capitalize} </th>\n" ).mkString
+    val valuesPart : String     =  evals.collect().map { row =>
       List("<tr style=\"height: 18px;\">\n <th scope=\"row\"class=\"text-center\"></th>\n".mkString,
         row.toSeq.map( field => s"$partTwo $field </td>\n").mkString,
         "</tr>\n").mkString
     }.mkString
-
+    // Generate Final Skeleton
     val finalSkeleton : String  = s"$hearderPart $columnList </tr>\n</thead>\n<tbody>\n$valuesPart </tbody>\n </table> \n <p> <br>  </p>\n </body> \n </html>"
 
     finalSkeleton
@@ -70,14 +75,6 @@ final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, o
       reportDirectory.delete()
       reportDirectory.mkdirs()
     }
-
-      //Save the Logo Img to the directory
-//      val logoIMG  = new File(reportDirectory + s"/caraML_logo_200x100.png")
-//    val s = Source.fromResource("caraML_logo_200x100.png")
-//    println(s"This is the Image content : $s")
-//
-//      val logoRead = ImageIO.read( new File(getClass.getResource("caraML_logo_200x100.png").getPath))
-//      ImageIO.write(logoRead, "png", logoIMG)
 
       //Create the HTML file
       val fileHTML = new File(reportDirectory + s"/ModelMetrics.html")
