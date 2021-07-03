@@ -11,7 +11,6 @@ import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.tuning.{CrossValidator, TrainValidationSplit}
 import org.apache.spark.sql.SparkSession
 
-
 import scala.util.Try
 
 class CaraModelTest extends TestBase {

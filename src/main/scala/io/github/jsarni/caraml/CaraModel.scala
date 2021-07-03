@@ -1,26 +1,22 @@
 package io.github.jsarni.caraml
 
-import io.github.jsarni.caraml.carayaml.CaraYamlReader
-import io.github.jsarni.caraml.pipelineparser.{CaraParser, CaraPipeline}
-import org.apache.spark.ml.tuning.{CrossValidator, CrossValidatorModel, ParamGridBuilder, TrainValidationSplit}
-import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, GBTClassificationModel, LogisticRegressionModel, NaiveBayes, NaiveBayesModel, RandomForestClassificationModel}
-import org.apache.spark.mllib.clustering.{KMeansModel, LDAModel}
-import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, GBTRegressionModel, LinearRegressionModel, RandomForestRegressionModel}
-import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer}
-
-import scala.collection.mutable
-import scala.util.Try
-import scala.io.Source
-import scala.util.{Success, Try}
 import java.io._
-
 import java.sql.Timestamp
 import java.time.Instant
 
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
-import org.apache.spark.sql.functions.{array, col, mean, when}
+import io.github.jsarni.caraml.carayaml.CaraYamlReader
+import io.github.jsarni.caraml.pipelineparser.{CaraParser, CaraPipeline}
+import org.apache.spark.ml.classification._
+import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, GBTRegressionModel, LinearRegressionModel, RandomForestRegressionModel}
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
+import org.apache.spark.ml.{Pipeline, PipelineModel, Transformer}
+import org.apache.spark.mllib.clustering.{KMeansModel, LDAModel}
+import org.apache.spark.sql.functions.{col, mean, when}
+import org.apache.spark.sql.{DataFrame, Dataset}
 
 import scala.collection.mutable
+import scala.io.Source
+import scala.util.Try
 
 
 final class CaraModel(yamlPath: String, dataset: Dataset[_], savePath: String, overwrite: Boolean = true) {
