@@ -2,7 +2,7 @@
 
 ## *Presentation*
 
-CaraMl is a Scala/Apache Spark framework for distributed Machine Learning programs, using the Apache Spark MLlib in the simplest possible way. No need to write hundreds or thousands code lines, just discribing pipline of models and/or transformations. The purpose is to do "Machine Learning as Code" 
+CaraML is a Scala/Apache Spark framework for distributed Machine Learning programs, using the Apache Spark MLlib in the simplest possible way. No need to write hundreds or thousands code lines, just discribing pipline of models and/or transformations. The purpose is to do "Machine Learning as Code" 
 
 
 
